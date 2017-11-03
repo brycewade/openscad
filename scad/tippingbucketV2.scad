@@ -117,21 +117,22 @@ module screwmount(){
                             screwmountcurve($thickness+$mountscrewradius);
                         }
                         translate([0,0,$basethickness*2]){
-                            linear_extrude(height=1.5*($thickness+$mountscrewradius),scale=[0.01,1]){
+                            linear_extrude(height=2*($thickness+$mountscrewradius),scale=[0.01,0.01]){
                                 screwmountcurve($thickness+$mountscrewradius);
                             }
                         }
                         
                     }
-        /*
-        */
+/*
                     translate([$thickness+$mountscrewradius,-$nutwidth/2,$basethickness]){
                         cube([$thickness+$mountscrewradius,$nutwidth,$nutheight]);           
                     }
                     translate([$thickness+$mountscrewradius,0,$basethickness]){
                         cylinder(d=$nutwidth*2/sqrt(3),h=$nutheight,$fn=6);
                     }
+*/
                 }
+/*
 // Put some supports in there
                 translate([$thickness+$mountscrewradius,0,$basethickness]){
                     for(deg=[30:60:360]){
@@ -145,6 +146,7 @@ module screwmount(){
                 translate([$thickness+$mountscrewradius,-0.2,$basethickness]){
                     cube([$thickness+$mountscrewradius,0.4,$nutheight]);
                 }
+*/
             }
             translate([$thickness+$mountscrewradius,0,0]){
                 cylinder(r=$mountscrewradius,h=2*$basethickness);
@@ -336,7 +338,7 @@ module basecircle(){
 // drain holes
         for(deg=[45:90:360]){
             rotate([0,0,deg]){
-                translate([$outsideD1*0.325,-1,-1]){
+                translate([(($outsideD1/4)+($outsideD1/2-($thickness+$mountscrewradius)))/2,-1,-1]){
                     cube([2,2,$basethickness+2]);
                 }
             }
@@ -397,37 +399,6 @@ module stickthecone(){
     
 }
 
-/*    
-translate([0,0,$baseheight]) {
-   rotate([0,0,180]){
-       translate([0,0,-2*$pivotradius]) bucket();
-   }
-}
 
-base();
-
-
-*/
-
-
-// Test ring
-translate([0,0,0]){
-    rotate([180,0,0]) {
-        intersection(){
-            translate([-($outsideD1+2*$thickness*2),-($outsideD1+2*$thickness*2),-$basethickness]){
-                cube([2*($outsideD1+2*$thickness*2),2*($outsideD1+2*$thickness*2),$basethickness*5.75]);
-            }
-            translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
-                rotate([180,0,0]) {
-                    cone();
-                }
-            }
-        }
-    }
-}
-
-
-//cone();
-//stickthecone();
-
+bucket();
 
