@@ -1,5 +1,3 @@
-include <threads.scad>
-
 $fn=360;
 $cmperinch=2.54;
 
@@ -21,19 +19,24 @@ $threadstarts=1;
 
 $wireholesize=5;
 
-$thickness=3;
+$thickness=2.4;
 $insideD1=125;
 $outsideD1=$insideD1+$thickness*2;
 $insideD2=10;
 $outsideD2=$insideD2+$thickness*2;
 $coneheight=$insideD1-$insideD2;
 $nozzleheight=15;
+$insidelip=$outsideD1+4;
 
 $bucketthickness=3;
 $bucketwidth=$insideD2+$marginforerror+$bucketthickness*2;
 //$bucketwidth=20;
 
 $mountscrewradius=1.5;
+$mountscrewheadradius=2.7;
+$mountscrewheadheight=3;
+$nutwidth=5.4;
+$nutheight=2.25;
 
 $buffer=2*($magnetthickness+1);
 $basethickness=$hallsensorthickness+2;
@@ -82,18 +85,69 @@ module outershell_inside(){
     cylinder(d1=$insideD1,d2=$outsideD1,h=$coneheight+$nozzleheight+2*$baseheight+$buffer+$basethickness*2);
 }
 
-module outershell_threads(){
-    translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer+$basethickness]){
-        rotate([180,0,0]){
-// I'm still not sure why I have to mirror this, but...
-            mirror([1,0,0]){
-                metric_thread($outsideD1+2+2.25,$threadpitch,$basethickness*2,internal=true,n_starts=$threadstarts,thread_size=2*$threadpitch);
+module outershell_lip(){
+    translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
+            cylinder(d=$insidelip, h=$basethickness*2);
+    }
+}
+module screwmountcurve($r){
+    difference(){
+        translate([0,-2*$r,0]){
+            square([$r,4*$r]);
+        }
+        translate([$r,-2*$r,0]){
+            circle(r=$r);
+        }
+        translate([$r,2*$r,0]){
+            circle(r=$r);
+        }
+    }
+    translate([$r,0,0]){
+        circle(r=$r);
+    }
+}
+
+module screwmount(){
+    rotate([0,0,180]){
+        difference(){
+            union(){/*
+                linear_extrude(height=$basethickness*2){
+                    screwmountcurve($thickness+$mountscrewradius);
+                }   */             
+                translate([0,0,$basethickness*2]){
+                    linear_extrude(height=1.5*($thickness+$mountscrewradius),scale=[0,1]){
+                        screwmountcurve($thickness+$mountscrewradius);
+                    }
+                }
+                
+            }
+            translate([$thickness+$mountscrewradius,0,0]){
+                cylinder(r=$mountscrewradius,h=2*$basethickness);
+            }
+            translate([$thickness+$mountscrewradius,-$nutwidth/2,$basethickness]){
+                cube([$thickness+$mountscrewradius,$nutwidth,$nutheight]);           
+            }
+            translate([$thickness+$mountscrewradius,0,$basethickness]){
+                cylinder(d=$nutwidth*$sqrt2,h=$nutheight,$fn=6);
+            }
+        }
+    }
+}
+
+module conemounts(){
+    for(deg=[45:90:360]){
+        rotate([0,0,deg]){
+            translate([$outsideD1/2,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
+                rotate([180,0,0]){
+                    screwmount();
+                }
             }
         }
     }
 }
 
 module cone(){
+    /*
     difference(){
         cone_outside();
         cone_inside();
@@ -101,11 +155,13 @@ module cone(){
     difference(){
         outershell_outside();
         outershell_inside();
-        outershell_threads();
+        outershell_lip();
     }
+    */
+    conemounts();
 }
 
- module prism(l, w, h){
+module prism(l, w, h){
        polyhedron(
                points=[[0,0,0], [l,0,0], [l,w,0], [0,w,0], [0,w,h], [l,w,h]],
                faces=[[0,1,2,3],[5,4,3,2],[0,4,5,1],[0,3,4],[5,2,1]]
@@ -170,10 +226,10 @@ module mesh_holes($width,$length,$height,$ratio,$columns,$rows){
 }
 
 module mesh(){
-    translate([0,0,-$basethickness*2]){
+    translate([0,0,-1]){
         intersection(){
             translate([-$cwt,$baselength,0]) {
-                mesh_holes($cwt*2,$insideD1/2-$baselength-$basethickness,$basethickness*3,2,7,6);
+                mesh_holes($cwt*2,$insideD1/2-$baselength-$basethickness,$basethickness+2,2,7,6);
             }
             cylinder(d=$insideD1,h=$basethickness*3);
         }
@@ -214,60 +270,97 @@ module hallsensorsupport(){
     
 module basewall(){
     translate([-$basewidth/2,-$outsideD1/2,0]){
-        cube([$basethickness,$outsideD1,$baseheight]);
+        cube([$basethickness,$outsideD1,$baseheight+$pivotradius*2]);
     }
-    translate([-$basewidth/2,-$outsideD1/2+$basethickness,0]){
+    translate([-$basewidth/2,-$outsideD1/2,0]){
         cube([$basewidth,$basethickness,$baseheight]);
     }
-    translate([-$basewidth/2,-$buckethalflength*1.1,$baseheight]){
-        cube([$basethickness,$buckethalflength*2.2,$pivotradius*2]);
-    }
 }
-module base(){
+
+module basecircle(){
     difference(){
-        translate([0,0,-$basethickness]){
-            metric_thread($outsideD1+2,$threadpitch,$basethickness*2,internal=false,n_starts=$threadstarts,thread_size=2*$threadpitch);
+        union(){
+            difference(){
+                cylinder(d=$insidelip, h=$basethickness*2);
+                translate([0,0,$basethickness]){                    
+                    cylinder(d=$outsideD1-$thickness*2,h=$basethickness+1);
+                }
+                
+            }
+            for(deg=[45:90:360]){
+                rotate([0,0,deg]){
+                   translate([$outsideD1/2,0,0]){
+                       rotate([0,0,180]) {
+                           linear_extrude(height=$basethickness*2){
+                               screwmountcurve($thickness+$mountscrewradius);
+                           }
+                       }
+                   } 
+                }
+            }
         }
-        cylinder(d=$outsideD1-$basethickness*2,h=$basethickness+1);
 // main drain mesh
         mesh();
 // mounting screw holes
         rotate([0,0,180]) mesh();
         for(deg=[45:90:360]){
             rotate([0,0,deg]){
-                translate([$outsideD1/4,0,-$basethickness-1]){
+                translate([$outsideD1/4,0,-1]){
                     cylinder(r=$mountscrewradius,h=$basethickness*2);
+                }
+                translate([$outsideD1/2-($thickness+$mountscrewradius),0,-1]){
+                    cylinder(r=$mountscrewradius,h=$basethickness*3);
+                    cylinder(r=$mountscrewheadradius,h=$mountscrewheadheight+1);
                 }
             }
         }
 // drain holes
         for(deg=[45:90:360]){
             rotate([0,0,deg]){
-                translate([$outsideD1*0.4,-1,-$basethickness*2]){
-                    cube([2,2,$basethickness*3]);
+                translate([$outsideD1*0.325,-1,-1]){
+                    cube([2,2,$basethickness+2]);
                 }
             }
         }
 // wire hole
-        translate([-$outsideD1*0.4,-$wireholesize/2,-$basethickness*2]){
-            cube([$wireholesize,$wireholesize,$basethickness*3]);
+        translate([-$outsideD1*0.4,-$wireholesize/2,-1]){
+            cube([$wireholesize,$wireholesize,$basethickness*2]);
         }
     }
-    difference(){
-        intersection(){
+}
+
+module basesupport(){
+    translate([]){
+        difference(){
             union(){
                 basewall();
+                rotate([0,0,180]) basewall();
                 translate([-$basewidth/2,0,$baseheight+$pivotradius*2]){
                     hallsensorsupport();
                 }
-                rotate([0,0,180]) basewall();
             }
-            outershell_inside();
+            translate([0,0,$baseheight]){
+                rotate([0,90,0]){
+                    translate([0,0,-$basewidth/2]){
+                        cylinder(r=$piviotradius*1.1,h=$basewidth);
+                    }
+                }
+            }
         }
-        translate([0,0,$baseheight]){
-            rotate([0,90,0]){
-                translate([0,0,-$basewidth/2]){
-                    cylinder(r=$piviotradius*1.1,h=$basewidth);
+    }
+}
+
+module base(){
+    intersection(){
+        union(){
+            basecircle();
+            basesupport();
+        }
+        translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer+$basethickness]){
+            rotate([180,0,0]){
+                union(){
+                    outershell_inside();
+                    outershell_lip();
                 }
             }
         }
@@ -296,19 +389,27 @@ base();
 
 
 */
-rotate([180,0,0]) {
-    intersection(){
-        translate([-($outsideD1+2*$thickness*2),-($outsideD1+2*$thickness*2),-$basethickness]){
-            cube([2*($outsideD1+2*$thickness*2),2*($outsideD1+2*$thickness*2),$basethickness*3]);
-        }
-        translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
-            rotate([180,0,0]) {
-                cone();
+
+
+// Test ring
+translate([0,0,0]){
+    rotate([180,0,0]) {
+        intersection(){
+            translate([-($outsideD1+2*$thickness*2),-($outsideD1+2*$thickness*2),-$basethickness]){
+                cube([2*($outsideD1+2*$thickness*2),2*($outsideD1+2*$thickness*2),$basethickness*5.5]);
+            }
+            translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
+                rotate([180,0,0]) {
+                    cone();
+                }
             }
         }
     }
 }
 
 
+
 //cone();
 //stickthecone();
+
+
