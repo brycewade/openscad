@@ -24,7 +24,7 @@ $insideD1=125;
 $outsideD1=$insideD1+$thickness*2;
 $insideD2=10;
 $outsideD2=$insideD2+$thickness*2;
-$coneheight=$insideD1-$insideD2;
+$coneheight=($insideD1-$insideD2)/2;
 $nozzleheight=15;
 $insidelip=$outsideD1+4;
 
@@ -110,26 +110,45 @@ module screwmountcurve($r){
 module screwmount(){
     rotate([0,0,180]){
         difference(){
-            union(){/*
-                linear_extrude(height=$basethickness*2){
-                    screwmountcurve($thickness+$mountscrewradius);
-                }   */             
-                translate([0,0,$basethickness*2]){
-                    linear_extrude(height=1.5*($thickness+$mountscrewradius),scale=[0,1]){
-                        screwmountcurve($thickness+$mountscrewradius);
+            union(){
+                difference(){
+                    union(){
+                        linear_extrude(height=$basethickness*2){
+                            screwmountcurve($thickness+$mountscrewradius);
+                        }
+                        translate([0,0,$basethickness*2]){
+                            linear_extrude(height=1.5*($thickness+$mountscrewradius),scale=[0.01,1]){
+                                screwmountcurve($thickness+$mountscrewradius);
+                            }
+                        }
+                        
+                    }
+        /*
+        */
+                    translate([$thickness+$mountscrewradius,-$nutwidth/2,$basethickness]){
+                        cube([$thickness+$mountscrewradius,$nutwidth,$nutheight]);           
+                    }
+                    translate([$thickness+$mountscrewradius,0,$basethickness]){
+                        cylinder(d=$nutwidth*2/sqrt(3),h=$nutheight,$fn=6);
                     }
                 }
-                
+// Put some supports in there
+                translate([$thickness+$mountscrewradius,0,$basethickness]){
+                    for(deg=[30:60:360]){
+                        rotate([0,0,deg]){
+                            translate([-0.2,0,0]){
+                                cube([0.4,$nutwidth/sqrt(3)-.5,$nutheight]);
+                            }
+                        }
+                    }
+                }
+                translate([$thickness+$mountscrewradius,-0.2,$basethickness]){
+                    cube([$thickness+$mountscrewradius,0.4,$nutheight]);
+                }
             }
             translate([$thickness+$mountscrewradius,0,0]){
                 cylinder(r=$mountscrewradius,h=2*$basethickness);
-            }
-            translate([$thickness+$mountscrewradius,-$nutwidth/2,$basethickness]){
-                cube([$thickness+$mountscrewradius,$nutwidth,$nutheight]);           
-            }
-            translate([$thickness+$mountscrewradius,0,$basethickness]){
-                cylinder(d=$nutwidth*$sqrt2,h=$nutheight,$fn=6);
-            }
+            }            
         }
     }
 }
@@ -137,7 +156,7 @@ module screwmount(){
 module conemounts(){
     for(deg=[45:90:360]){
         rotate([0,0,deg]){
-            translate([$outsideD1/2,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
+            translate([$outsideD1/2,0,$coneheight+$nozzleheight+2*$baseheight+$buffer-$basethickness]){
                 rotate([180,0,0]){
                     screwmount();
                 }
@@ -147,17 +166,17 @@ module conemounts(){
 }
 
 module cone(){
-    /*
     difference(){
-        cone_outside();
+        union(){
+            cone_outside();
+            difference(){
+                outershell_outside();
+                outershell_inside();
+                outershell_lip();
+            }
+        }
         cone_inside();
-    }
-    difference(){
-        outershell_outside();
-        outershell_inside();
-        outershell_lip();
-    }
-    */
+    }    
     conemounts();
 }
 
@@ -396,7 +415,7 @@ translate([0,0,0]){
     rotate([180,0,0]) {
         intersection(){
             translate([-($outsideD1+2*$thickness*2),-($outsideD1+2*$thickness*2),-$basethickness]){
-                cube([2*($outsideD1+2*$thickness*2),2*($outsideD1+2*$thickness*2),$basethickness*5.5]);
+                cube([2*($outsideD1+2*$thickness*2),2*($outsideD1+2*$thickness*2),$basethickness*5.75]);
             }
             translate([0,0,$coneheight+$nozzleheight+2*$baseheight+$buffer]){
                 rotate([180,0,0]) {
@@ -406,7 +425,6 @@ translate([0,0,0]){
         }
     }
 }
-
 
 
 //cone();
