@@ -11,13 +11,14 @@ $magnetholderwidth=10;
 $hallsensorwidth=4.53+0.5;
 $hallsensorthickness=1.6+0.5;
 $hallsensorheight=4.78;
-$hallsensorpinwidth=3.2;
+//$hallsensorpinwidth=3.2;
+$hallsensorpinwidth=$hallsensorwidth;
 $hallsensorpinheight=14.76;
 
 $threadpitch=2;
 $threadstarts=1;
 
-$wireholesize=5;
+$wireholesize=5.75;
 
 $thickness=2.4;
 $insideD1=125;
@@ -291,7 +292,7 @@ module hallsensorsupport(){
     
 module basewall(){
     translate([-$basewidth/2,-$outsideD1/2,0]){
-        cube([$basethickness,$outsideD1,$baseheight+$pivotradius*2]);
+        cube([$basethickness,$outsideD1,$baseheight+$pivotradius*3]);
     }
     translate([-$basewidth/2,-$outsideD1/2,0]){
         cube([$basewidth,$basethickness,$baseheight]);
@@ -344,8 +345,12 @@ module basecircle(){
             }
         }
 // wire hole
-        translate([-$outsideD1*0.4,-$wireholesize/2,-1]){
-            cube([$wireholesize,$wireholesize,$basethickness*2]);
+        translate([-$outsideD1*0.4,0,$basethickness]){
+            rotate([0,45,0]){
+                translate([0,0,-$basethickness*2]){
+                    cylinder(d=$wireholesize,h=$basethickness*4);
+                }
+            }
         }
     }
 }
@@ -389,16 +394,43 @@ module base(){
 }
 
 module stickthecone(){
-    
-        cylinder(d=$insideD1-5,h=0.5);
-        for(deg=[0:11.25:360]){
-            rotate([0,0,deg]){
+    cylinder(d=$insideD1-5,h=0.5);
+    for(deg=[0:11.25:360]){
+        rotate([0,0,deg]){
+            translate([0,-0.4,0.5]){
                 cube([$outsideD1/2,0.8,0.5]);
             }
         }
-    
+    }
+    difference(){
+        cylinder(d=$outsideD1+15,h=0.5);
+        cylinder(d=$outsideD1+5,h=0.5);
+    }
+    for(deg=[0:11.25/2:360]){
+        rotate([0,0,deg]){
+            translate([$outsideD1/2,-0.4,0.5]){
+                cube([7.5,0.8,0.5]);
+            }
+        }
+    }    
 }
 
+module stickthebase(){
+    difference(){
+        cylinder(d=$insidelip+15,h=0.5);
+        cylinder(d=$insidelip+5,h=0.5);
+    }
+    for(deg=[0:11.25/2:360]){
+        rotate([0,0,deg]){
+            translate([$insidelip/2,-0.4,0.5]){
+                cube([7.5,0.8,0.5]);
+            }
+        }
+    }    
+}
 
-bucket();
-
+//cone();
+//stickthecone();
+//bucket();
+base();
+//stickthebase();
