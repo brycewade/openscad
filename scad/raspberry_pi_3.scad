@@ -101,7 +101,7 @@ module rfmcutout(){
     translate([rfmlength,rfmthickness,0]) cube([rfmthickness*2,rfmthickness/2,rfmheight+rfmthickness]);
     translate([rfmlength,rfmwidth+rfmthickness/2,0]) cube([rfmthickness*2,rfmthickness/2,rfmheight+rfmthickness]);
     translate([rfmthickness,rfmthickness+rfmwidth/2,rfmheight]) {
-        linear_extrude(rfmheight=rfmthickness,scale=[1,.9]){
+        linear_extrude(height=rfmthickness,scale=[1,.9]){
             translate([0,-rfmwidth/2,0]) square([rfmlength,rfmwidth]);
         }
     }
