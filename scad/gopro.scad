@@ -8,12 +8,15 @@ $screwdiameter=4.85;
 $screwcenter=$height-5-$screwdiameter/2;
 
 $thickness=5.5;
-$mountoffset=6;
+$mountradius=$screwdiameter/2+$thickness;
+//$mountoffset=6;
+//$mountoffset=18-$depth+$screwdiameter/2;
+
 $mountheight=16;
 $mountwidth=8.8;
-$mountradius=$screwdiameter/2+$thickness;
 $mountcenter=$mountheight-$mountradius;
 $mouncutout=$mountwidth-5.6;
+$mountoffset=$mouncutout/2+$mountradius;
 
 $arcwidth=$width;
 $archeight=$depth-9.6;
@@ -60,7 +63,7 @@ module minus(){
             translate([0,$mouncutout/2,0]){
                 cylinder(d=$mouncutout,h=$mountheight);
             }
-            translate([-$mouncutout/2,$mountcenter,0]){
+            translate([-$mouncutout/2,$mountoffset,0]){
                 cube([$mouncutout,$mountradius,$mountheight]);
             }
         }
