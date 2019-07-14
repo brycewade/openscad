@@ -25,7 +25,7 @@ linear_extrude(height=$height,scale=[1,$length_scale],slices=20,twist=0){
 translate([$width/8,$width/8,$height]){
     linear_extrude(height=2){
             scale($logo_width/52){
-            import("/home/bryce/Downloads/8_TH_SOLID_0004_black.dxf");
+            import("../images/8_TH_SOLID_0004_black.dxf");
         }
     }
 }

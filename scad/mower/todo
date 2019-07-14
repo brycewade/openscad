@@ -1,0 +1,21 @@
+* Design board holder for:
+	X RTC
+	X Relay
+	X Nano
+	* Compass
+	* Voltage sensor
+	* Current sensor
+* Design weed trimmer mount
+* Design adustable height front wheel
+* Design bumpers with switches
+* Determine placement for board holders
+* Design base parts
+* Design striper
+* Map yard
+* Develop slicer for yard
+* Modify code to accept g-code like instructions from Rpi
+* Develop Rpi code to send g-code like instructions
+* Design charging station
+* Add tilt sensor code
+
+
