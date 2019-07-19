@@ -4,7 +4,7 @@ include <blade_driver_mount.scad>
 include <motor_mount.scad>
 
 visualize=true;
-quick=false;
+quick=true;
 
 back_y=-total_blade_radius-blade_y_offset-blade_gap-base_wall_thickness;
 very_back_y=back_y-4*wheel_motor_mount_width;
@@ -14,19 +14,24 @@ base_top=base_thickness+base_blade_indent_height;
 //motor driver locations
 motor_driver1x=-10-motor_driver_base_width/2;
 motor_driver1y=very_back_y+motor_driver_base_length/2+fan_duct_depth+10;
+motor_driver1deg=0;
 
 motor_driver2x=10+motor_driver_base_width/2;
 motor_driver2y=motor_driver1y;
+motor_driver2deg=0;
 
 // Blade driver locations
 blade_driver1x=-20-blade_driver_base_pad;
 blade_driver1y=very_back_y+blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension+100;
+blade_driver1deg=90;
 
 blade_driver2x=-base_width/2+10+(blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension);
 blade_driver2y=-blade_y_offset+total_blade_radius+blade_gap-base_blade_rounding_radius+10+blade_driver_base_pad/2;
+blade_driver2deg=0;
 
 blade_driver3x=base_width/2-10-(blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension);
 blade_driver3y=-total_blade_radius-blade_gap-base_blade_rounding_radius-10-blade_driver_base_pad/2;
+blade_driver3deg=180;
 
 module cutout(){
     rotate_extrude(){
@@ -57,7 +62,7 @@ module all_the_parts(){
         }
     }
     translate([motor_driver2x,motor_driver2y,base_top]){
-        rotate([0,0,0]){
+        rotate([0,0,blade_driver2deg]){
             if (quick){
                 quick_motor_driver();
             }else{
@@ -66,7 +71,7 @@ module all_the_parts(){
         }
     }
     translate([blade_driver1x,blade_driver1y,base_top]){
-        rotate([0,0,90]){
+        rotate([0,0,blade_driver1deg]){
             if (quick){
                     quick_blade_driver();
                 }else{
@@ -84,7 +89,7 @@ module all_the_parts(){
         }
     }
     translate([blade_driver3x,blade_driver3y,base_top]){
-        rotate([0,0,180]){
+        rotate([0,0,blade_driver3deg]){
             if (quick){
                 quick_blade_driver();
             }else{
@@ -152,20 +157,20 @@ module minus(){
     }
     // mounting holes for the motor driver mounts
     translate([motor_driver1x,motor_driver1y,base_top]){
-        rotate([0,0,0]) motor_driver_mounting_holes();
+        rotate([0,0,motor_driver1deg]) motor_driver_mounting_holes();
     }
     translate([motor_driver2x,motor_driver2y,base_top]){
-        rotate([0,0,0]) motor_driver_mounting_holes();
+        rotate([0,0,motor_driver2deg]) motor_driver_mounting_holes();
     }
     // Mounting holes for the blade driver mounts
     translate([blade_driver1x,blade_driver1y,base_top]){
-        rotate([0,0,90]) blade_driver_mounting_holes();
+        rotate([0,0,blade_driver1deg]) blade_driver_mounting_holes();
     }
     translate([blade_driver2x,blade_driver2y,base_top]){
-        rotate([0,0,0]) blade_driver_mounting_holes();
+        rotate([0,0,blade_driver2deg]) blade_driver_mounting_holes();
     }
     translate([blade_driver3x,blade_driver3y,base_top]){
-        rotate([0,0,180]) blade_driver_mounting_holes();
+        rotate([0,0,blade_driver3deg]) blade_driver_mounting_holes();
     }
     // Cut out wheel slots
     translate([-base_width/2,very_back_y+1.5*wheel_motor_mount_width-wheel_radius-base_wheel_buffer_y,0]){

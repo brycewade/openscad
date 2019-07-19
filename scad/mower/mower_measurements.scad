@@ -57,6 +57,9 @@ m4_screw_head_height=3.81;
 m4_nut_diameter=7.83;
 m4_nut_height=3.03;
 
+// Start of m8 nut dimensions
+m8_nut_height=6;
+
 // Start of mower blade dimensions
 total_blade_radius=107;
 blade_mount_radius=90;
@@ -251,10 +254,20 @@ nano_board_height=1.75*1.5;
 nano_mount_thickness=8;
 nano_offset_height=1;
 
+// Start blade mount connector measurements
+blade_mount_connector_outter_diameter=26;
+blade_mount_connector_inner_diameter=8;
+blade_mount_connector_height=33;
+blade_mount_connector_cross_bar=27.5;
+socket_14mm_diameter=21;
 
 // Common modules
 module m3_nut(){
     cylinder(d=nut_diameter*1.05, h=nut_height*1.1, $fn=6);
+}
+
+module m4_nut(){
+    cylinder(d=m4_nut_diameter*1.05, h=m4_nut_height*1.1, $fn=6);
 }
 
 module m3_nut_plus_bolt(length, overrun){
@@ -264,7 +277,12 @@ module m3_nut_plus_bolt(length, overrun){
     }
 }
 
-
+module m4_nut_plus_bolt(length, overrun){
+    m4_nut();
+    translate([0,0,m4_nut_height*1.1+overrun-length]){
+        cylinder(d=screw_diameter,h=length);
+    }
+}
 
 
 deck_height=(wheel_diameter-wheel_motor_diameter)/2;
