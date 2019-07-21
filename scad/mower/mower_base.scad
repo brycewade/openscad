@@ -3,8 +3,8 @@ include <motor_driver_mount.scad>
 include <blade_driver_mount.scad>
 include <motor_mount.scad>
 
-visualize=true;
-quick=true;
+visualize=false;
+quick=false;
 
 back_y=-total_blade_radius-blade_y_offset-blade_gap-base_wall_thickness;
 very_back_y=back_y-4*wheel_motor_mount_width;
@@ -34,6 +34,7 @@ blade_driver3y=-total_blade_radius-blade_gap-base_blade_rounding_radius-10-blade
 blade_driver3deg=180;
 
 module cutout(){
+    cylinder(d=blade_mount_connector_outter_diameter+4, h=base_top);
     rotate_extrude(){
         square([total_blade_radius+blade_gap,base_blade_indent_height]);
         translate([total_blade_radius+blade_gap,0,0]){
@@ -48,6 +49,7 @@ module cutout(){
 }
 
 module quick_cutout(){
+    cylinder(d=blade_mount_connector_outter_diameter+4, h=base_top);
     cylinder(r=total_blade_radius+blade_gap+base_blade_rounding_radius,h=base_blade_indent_height);
 }
 
@@ -70,6 +72,8 @@ module all_the_parts(){
             }
         }
     }
+/*
+    //Leave this out for now
     translate([blade_driver1x,blade_driver1y,base_top]){
         rotate([0,0,blade_driver1deg]){
             if (quick){
@@ -79,6 +83,7 @@ module all_the_parts(){
             }
         }
     }
+*/
     translate([blade_driver2x,blade_driver2y,base_top]){
         rotate([0,0,0]){
             if (quick){
@@ -88,6 +93,7 @@ module all_the_parts(){
             }
         }
     }
+
     translate([blade_driver3x,blade_driver3y,base_top]){
         rotate([0,0,blade_driver3deg]){
             if (quick){
@@ -97,16 +103,19 @@ module all_the_parts(){
             }
         }
     }
+    
 }
 
 module plus(){
     translate([-base_width/2,back_y,0]){
         cube([base_width,base_blade_indent_length,base_top]);
     }
-    translate([0,front_y,0]){
-        scale([1,0.5,1]) {
-            cylinder(d=base_width, h=base_top);
-        }
+    translate([-base_width/2+base_front_curve_radius,trimmer_y_offset+front_y,0]){
+        cylinder(r=base_front_curve_radius, h=base_top);
+        cube([base_width-2*base_front_curve_radius,base_front_curve_radius,base_top]);
+    }
+    translate([base_width/2-base_front_curve_radius,trimmer_y_offset+front_y,0]){
+        cylinder(r=base_front_curve_radius, h=base_top);
     }
     translate([-base_width/2,very_back_y,0]){
         cube([base_width,4*wheel_motor_mount_width,base_top]);
@@ -116,7 +125,38 @@ module plus(){
     }
 }
 
-module minus(){
+module motor_drivers_minus(){
+    translate([motor_driver1x,motor_driver1y,base_top]){
+        rotate([0,0,motor_driver1deg]) motor_driver_mounting_holes();
+    }
+    translate([motor_driver2x,motor_driver2y,base_top]){
+        rotate([0,0,motor_driver2deg]) motor_driver_mounting_holes();
+    }
+}
+
+module blade_drivers_minus(){
+    /*
+    // Leave this out for now
+    translate([blade_driver1x,blade_driver1y,base_top]){
+        rotate([0,0,blade_driver1deg]) blade_driver_mounting_holes();
+    }
+    */
+    translate([blade_driver2x,blade_driver2y,base_top]){
+        rotate([0,0,blade_driver2deg]) blade_driver_mounting_holes();
+    }
+    translate([blade_driver3x,blade_driver3y,base_top]){
+        rotate([0,0,blade_driver3deg]) blade_driver_mounting_holes();
+    }
+}
+
+module mount_holes(){
+    // mounting holes for the motor driver mounts
+    motor_drivers_minus();
+    // Mounting holes for the blade driver mounts
+    blade_drivers_minus();
+}
+
+module blade_holes(){
     // Cut out the blade holes
     translate([blade_x_offset/2,0,0]){
         if (quick){
@@ -132,6 +172,9 @@ module minus(){
             cutout();
         }
     }
+}
+
+module motor_mount_holes(){
     // Punch holes for the wheel motor mounts
     translate([-base_width/2+wheel_motor_mount_height+wheel_height+base_wheel_buffer_x+wheel_mount_screw_height,very_back_y+1.5*wheel_motor_mount_width,0]){
         linear_extrude(height=base_top){
@@ -155,23 +198,9 @@ module minus(){
             }
         }
     }
-    // mounting holes for the motor driver mounts
-    translate([motor_driver1x,motor_driver1y,base_top]){
-        rotate([0,0,motor_driver1deg]) motor_driver_mounting_holes();
-    }
-    translate([motor_driver2x,motor_driver2y,base_top]){
-        rotate([0,0,motor_driver2deg]) motor_driver_mounting_holes();
-    }
-    // Mounting holes for the blade driver mounts
-    translate([blade_driver1x,blade_driver1y,base_top]){
-        rotate([0,0,blade_driver1deg]) blade_driver_mounting_holes();
-    }
-    translate([blade_driver2x,blade_driver2y,base_top]){
-        rotate([0,0,blade_driver2deg]) blade_driver_mounting_holes();
-    }
-    translate([blade_driver3x,blade_driver3y,base_top]){
-        rotate([0,0,blade_driver3deg]) blade_driver_mounting_holes();
-    }
+}
+
+module wheel_slots(){
     // Cut out wheel slots
     translate([-base_width/2,very_back_y+1.5*wheel_motor_mount_width-wheel_radius-base_wheel_buffer_y,0]){
         cube([wheel_height+base_wheel_buffer_x,wheel_diameter+2*base_wheel_buffer_y,base_top]);
@@ -181,8 +210,22 @@ module minus(){
     }
 }
 
+module minus(){
+    blade_holes();
+    motor_mount_holes();
+    wheel_slots();
+}
+
 echo("Width=",base_width/10," cm, or ",base_width/25.4," in");
 echo("Length=",(front_y-very_back_y+base_width/2)/10," cm, or ",(front_y-very_back_y+base_width/2)/25.4," in");
+echo("Wheel cutout width=",wheel_height+base_wheel_buffer_x);
+cutout_start=very_back_y+1.5*wheel_motor_mount_width-wheel_radius-base_wheel_buffer_y;
+cutout_end=cutout_start+wheel_diameter+2*base_wheel_buffer_y;
+cutout_length=cutout_end-very_back_y;
+echo("Wheel cutout length=",cutout_length);
+echo("Wheel center=",1.5*wheel_motor_mount_width);
+echo("Blades are in ", (base_width-blade_x_offset)/2, "mm from the side");
+echo("blades are offset ", blade_y_offset, "mm from each other");
 
 difference(){
     plus();

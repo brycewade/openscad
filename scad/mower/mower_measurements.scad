@@ -80,12 +80,17 @@ blade_x_offset=(2-blade_overlap)*total_blade_radius;
 blade_y_offset=sqrt(blade_hypotnuse*blade_hypotnuse-blade_x_offset*blade_x_offset);
 blade_offset_angle=atan(blade_y_offset/blade_x_offset);
 blade_total_width=blade_x_offset+2*total_blade_radius;
-base_thickness=3;
+base_thickness=4;
 base_wall_thickness=4;
 base_width=2*base_wall_thickness+2*blade_gap+blade_total_width;
 base_blade_indent_length=2*total_blade_radius+blade_y_offset+2*blade_gap+2*base_wall_thickness;
 base_blade_indent_height=15;
 base_blade_rounding_radius=5;
+base_front_curve_radius=50.8;
+trimmer_radius=150;
+trimmer_hypotnuse=trimmer_radius+blade_gap+total_blade_radius;
+trimmer_x_offset=(base_width/2-base_front_curve_radius)-blade_x_offset;
+trimmer_y_offset=sqrt(trimmer_hypotnuse*trimmer_hypotnuse-trimmer_x_offset*trimmer_x_offset);
 base_mounting_screw_length=8;
 base_mounting_nut_depth=4;
 base_wheel_buffer_x=5;
@@ -257,8 +262,8 @@ nano_offset_height=1;
 // Start blade mount connector measurements
 blade_mount_connector_outter_diameter=26;
 blade_mount_connector_inner_diameter=8;
-blade_mount_connector_height=33;
-blade_mount_connector_cross_bar=27.5;
+blade_mount_connector_height=35;
+blade_mount_connector_cross_bar=29.5;
 socket_14mm_diameter=21;
 
 // Common modules
@@ -280,7 +285,7 @@ module m3_nut_plus_bolt(length, overrun){
 module m4_nut_plus_bolt(length, overrun){
     m4_nut();
     translate([0,0,m4_nut_height*1.1+overrun-length]){
-        cylinder(d=screw_diameter,h=length);
+        cylinder(d=m4_screw_diameter,h=length);
     }
 }
 
