@@ -127,16 +127,16 @@ module quick_blade_driver(){
 }
 
 module blade_driver_mounting_holes(){
-    translate([-blade_driver_base_pad/2+screw_head_diameter,-blade_driver_base_pad/2+screw_head_diameter,-base_mounting_nut_depth-1.1*nut_height]){
+    translate([-blade_driver_base_pad/2+screw_head_diameter,-blade_driver_base_pad/2+screw_head_diameter,0]){
         m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
     }
-    translate([-blade_driver_base_pad/2+screw_head_diameter,blade_driver_base_pad/2-screw_head_diameter,-base_mounting_nut_depth-1.1*nut_height]){
+    translate([-blade_driver_base_pad/2+screw_head_diameter,blade_driver_base_pad/2-screw_head_diameter,0]){
         m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
     }
-    translate([blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension-screw_head_diameter,-blade_driver_base_pad/2+screw_head_diameter,-base_mounting_nut_depth-1.1*nut_height]){
+    translate([blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension-screw_head_diameter,-blade_driver_base_pad/2+screw_head_diameter,0]){
         m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
     }
-    translate([blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension-screw_head_diameter,blade_driver_base_pad/2-screw_head_diameter,-base_mounting_nut_depth-1.1*nut_height]){
+    translate([blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension-screw_head_diameter,blade_driver_base_pad/2-screw_head_diameter,0]){
         m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
     }
 }

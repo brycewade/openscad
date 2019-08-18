@@ -58,12 +58,15 @@ module motor_mount_rail_nuts(){
 }
 
 module motor_mount_plus(){
+    // Rectangular base
     translate([-wheel_motor_mount_width/2,0,0]){
         cube([wheel_motor_mount_width,wheel_motor_mount_length,wheel_motor_mount_height]);
     }
+    // Cylinder at the top of the motor
     translate([0,0,wheel_motor_height+wheel_motor_narrow_height]){
         cylinder(d=wheel_motor_mount_width,h=wheel_motor_nub_height);
     }
+    // bearing holder
     translate([0,0,wheel_motor_total_height]){
        cylinder(r=2*wheel_motor_mount_hole_radius-wheel_motor_bearing_outer_diameter/2,h=wheel_motor_bearing_width);
     } 
@@ -98,10 +101,7 @@ module motor_mount(){
 }
 
 
-module m3_bolt(height){
-    cylinder(d=screw_diameter,h=height+screw_head_height);
-    cylinder(d=screw_head_diameter, h=screw_head_height);
-}
+
 
 module motor_mount_rail_plus(){
     translate([-wheel_motor_mount_rail_width/2,0,0]){

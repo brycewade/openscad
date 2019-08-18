@@ -1,5 +1,3 @@
-
-
 wheel_motor_diameter=37.5;
 wheel_motor_total_height=71;
 wheel_motor_nub_diameter=12.25;
@@ -41,8 +39,10 @@ wheel_mount_total_height=wheel_motor_bearing_width+1+wheel_mount_height;
 
 // Start of m3 screw dimensions
 screw_diameter=3;
-screw_head_diameter=5;
+screw_head_diameter=5.5;
 screw_head_height=3;
+screw_countersunk_head_diameter=6;
+screw_countersunk_head_height=2;
 
 // Start of m3 nut dimensions
 nut_diameter=6;
@@ -81,6 +81,7 @@ blade_y_offset=sqrt(blade_hypotnuse*blade_hypotnuse-blade_x_offset*blade_x_offse
 blade_offset_angle=atan(blade_y_offset/blade_x_offset);
 blade_total_width=blade_x_offset+2*total_blade_radius;
 base_thickness=4;
+base_second_layer_thickness=6;
 base_wall_thickness=4;
 base_width=2*base_wall_thickness+2*blade_gap+blade_total_width;
 base_blade_indent_length=2*total_blade_radius+blade_y_offset+2*blade_gap+2*base_wall_thickness;
@@ -89,12 +90,36 @@ base_blade_rounding_radius=5;
 base_front_curve_radius=50.8;
 trimmer_radius=150;
 trimmer_hypotnuse=trimmer_radius+blade_gap+total_blade_radius;
-trimmer_x_offset=(base_width/2-base_front_curve_radius)-blade_x_offset;
+trimmer_x_offset=(base_width/2-base_front_curve_radius)-blade_x_offset/2;
 trimmer_y_offset=sqrt(trimmer_hypotnuse*trimmer_hypotnuse-trimmer_x_offset*trimmer_x_offset);
-base_mounting_screw_length=8;
-base_mounting_nut_depth=4;
+trimmer_z_offset=9;
+base_mounting_screw_length=6;
+base_mounting_nut_depth=6;
 base_wheel_buffer_x=5;
 base_wheel_buffer_y=10;
+base_screw_offset=10;
+
+// Start of front wheel dimensions
+front_wheel_prism_height=7;
+front_wheel_prism_width=3;
+front_wheel_prism_length=3;
+front_wheel_diameter=75;
+front_wheel_radius=front_wheel_diameter/2;
+front_wheel_height=10;
+front_wheel_screw_depth=6;
+front_wheel_mount_bearing_buffer=3.5;
+front_wheel_mount_inner_diameter=wheel_motor_bearing_inner_diameter+front_wheel_mount_bearing_buffer;
+front_wheel_mount_outer_diameter=wheel_motor_bearing_outer_diameter-front_wheel_mount_bearing_buffer;
+front_wheel_mount_buffer=2;
+front_wheel_mount_pivot_height=50;
+front_mount_x=base_wall_thickness+wheel_motor_bearing_outer_diameter/2-front_wheel_mount_inner_diameter/2+front_wheel_mount_inner_diameter/2+front_wheel_mount_buffer/2+front_wheel_radius;
+front_mount_y=front_wheel_height+wheel_motor_bearing_width+2*front_wheel_mount_buffer;
+front_mount_radius=sqrt(front_mount_x*front_mount_x+front_mount_y*front_mount_y)+base_wheel_buffer_x;
+
+// Figure out where base side of the front wheel mount
+front_mount_base_legx=-base_width/2+base_front_curve_radius;
+front_mount_base_hypotnuse=front_mount_radius+trimmer_radius;
+front_mount_base_legy=sqrt(front_mount_base_hypotnuse*front_mount_base_hypotnuse-front_mount_base_legx*front_mount_base_legx)-base_front_curve_radius;
 
 // Start of GPS mount dimensions
 gps_board_x=43.8;
@@ -163,8 +188,8 @@ trimmer_cylinder_head_depth=trimmer_cylinder_depth2-trimmer_cylinder_depth1-trim
 trimmer_cylinder_bolt_length=14;
 trimmer_cylinder_depth=trimmer_cylinder_bolt_length-trimmer_cylinder_head_depth;
 trimmer_center_circle_diameter=23.8;
-trimmer_inner_circle_diameter1=52.35;
-trimmer_inner_circle_diameter2=56.21;
+trimmer_inner_circle_diameter1=51;
+trimmer_inner_circle_diameter2=58;
 trimmer_outer_circle_diameter1=70.65;
 trimmer_outer_circle_diameter2=74.15;
 trimmer_circle_depth=6.85;
@@ -266,9 +291,36 @@ blade_mount_connector_height=35;
 blade_mount_connector_cross_bar=29.5;
 socket_14mm_diameter=21;
 
+// Start blade motor mount measurements
+blade_motor_diameter=51;
+blade_motor_mount_height=35;
+blade_motor_nub_height=6.7;
+blade_motor_nub_diameter=26.15;
+blade_motor_mount_bolt_distance=40.84;
+blade_motor_mount_bolt_height=10;
+blade_motor_nub_to_connector=4.7;
+blade_buffer=3;
+blade_motor_mount_extension=blade_mount_connector_cross_bar+blade_motor_nub_to_connector+blade_buffer-base_wall_thickness-base_second_layer_thickness;
+blade_motor_mount_extension_overlap=10;
+blade_motor_mount_leg_width=10;
+blade_motor_mount_radius=blade_mount_inner_screw_radius+m4_nut_diameter/2+2*blade_buffer+2*blade_motor_mount_leg_width;
+
+// Start of side brace measurements
+side_brace_base_hole=20;
+side_brace_side_hole=25;
+side_brace_base_length=side_brace_base_hole+10;
+side_brace_side_length=side_brace_side_hole+10;
+side_brace_width=10;
+side_brace_thickness=4;
+
 // Common modules
 module m3_nut(){
     cylinder(d=nut_diameter*1.05, h=nut_height*1.1, $fn=6);
+}
+
+module m3_bolt(height){
+    cylinder(d=screw_diameter,h=height+screw_head_height);
+    cylinder(d=screw_head_diameter, h=screw_head_height);
 }
 
 module m4_nut(){
@@ -289,6 +341,20 @@ module m4_nut_plus_bolt(length, overrun){
     }
 }
 
+module prism(l, w, h) {
+       polyhedron(points=[
+               [0,-l/2,h/2],           // 0    front top corner
+               [0,-l/2,-h/2],[w,-l/2,0],   // 1, 2 front left & right bottom corners
+               [0,l/2,h/2],           // 3    back top corner
+               [0,l/2,-h/2],[w,l/2,0]    // 4, 5 back left & right bottom corners
+       ], faces=[ // points for all faces must be ordered clockwise when looking in
+               [0,2,1],    // top face
+               [3,4,5],    // base face
+               [0,1,4,3],  // h face
+               [1,2,5,4],  // w face
+               [0,3,5,2],  // hypotenuse face
+       ]);
+}
 
 deck_height=(wheel_diameter-wheel_motor_diameter)/2;
 echo("Deck height = ", deck_height/10, " cm");

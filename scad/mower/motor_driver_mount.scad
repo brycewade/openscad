@@ -97,7 +97,7 @@ module quick_motor_driver(){
 module motor_driver_mounting_holes(){
     for(x=[-motor_driver_base_width/2+motor_driver_base_hole_offsets:motor_driver_base_width-2*motor_driver_base_hole_offsets:motor_driver_base_width/2]){
         for(y=[-motor_driver_base_length/2+motor_driver_base_hole_offsets:motor_driver_base_length-2*motor_driver_base_hole_offsets+fan_duct_depth:motor_driver_base_length/2+fan_duct_depth]){
-            translate([x,y,-base_mounting_nut_depth-1.1*nut_height]){
+            translate([x,y,0]){
                 m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
             }
         }

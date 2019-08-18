@@ -2,21 +2,6 @@ $fn=360;
 
 include <mower_measurements.scad>
 
-module prism(l, w, h) {
-       polyhedron(points=[
-               [0,-l/2,h/2],           // 0    front top corner
-               [0,-l/2,-h/2],[w,-l/2,0],   // 1, 2 front left & right bottom corners
-               [0,l/2,h/2],           // 3    back top corner
-               [0,l/2,-h/2],[w,l/2,0]    // 4, 5 back left & right bottom corners
-       ], faces=[ // points for all faces must be ordered clockwise when looking in
-               [0,2,1],    // top face
-               [3,4,5],    // base face
-               [0,1,4,3],  // h face
-               [1,2,5,4],  // w face
-               [0,3,5,2],  // hypotenuse face
-       ]);
-}
-
 
 module tread(){
     translate([wheel_radius-wheel_prism_width-0.5,0,0]) {
