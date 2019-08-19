@@ -53,9 +53,18 @@ m4_screw_diameter=3.87;
 m4_screw_head_diameter=6.85;
 m4_screw_head_height=3.81;
 
-// Start of m3 nut dimensions
+// Start of m4 nut dimensions
 m4_nut_diameter=7.83;
 m4_nut_height=3.03;
+
+// Start of m6 screw dimensions
+m6_screw_diameter=5.9;
+m6_screw_head_diameter=9.25;
+m6_screw_head_height=6;
+
+// Start of m6 nut dimensions
+m6_nut_diameter=11.25;
+m6_nut_height=4.76;
 
 // Start of m8 nut dimensions
 m8_nut_height=6;
@@ -190,8 +199,8 @@ trimmer_cylinder_depth=trimmer_cylinder_bolt_length-trimmer_cylinder_head_depth;
 trimmer_center_circle_diameter=23.8;
 trimmer_inner_circle_diameter1=51;
 trimmer_inner_circle_diameter2=58;
-trimmer_outer_circle_diameter1=70.65;
-trimmer_outer_circle_diameter2=74.15;
+trimmer_outer_circle_diameter1=70;
+trimmer_outer_circle_diameter2=75;
 trimmer_circle_depth=6.85;
 trimmer_diameter=88.5;
 trimmer_lever_diameter=7.25;
@@ -201,6 +210,7 @@ trimmer_lever_outer_diameter=10.45;
 trimmer_lever_radial_offset=(trimmer_inner_circle_diameter1-trimmer_lever_outer_diameter)/2;
 trimmer_lever_vertical_offset=(trimmer_radial_line_width+trimmer_lever_outer_diameter)/2;
 trimmer_lever_angular_offset=asin(trimmer_lever_vertical_offset/trimmer_lever_radial_offset);
+trimmer_wall_thickness=3;
 
 // Start Blade Driver measurements
 blade_driver_heatsink_width=51;
@@ -332,6 +342,11 @@ module m3_nut_plus_bolt(length, overrun){
     translate([0,0,nut_height*1.1+overrun-length]){
         cylinder(d=screw_diameter,h=length);
     }
+}
+
+module m4_bolt(height){
+    cylinder(d=m4_screw_diameter,h=height+m4_screw_head_height);
+    cylinder(d=m4_screw_head_diameter, h=m4_screw_head_height);
 }
 
 module m4_nut_plus_bolt(length, overrun){
