@@ -183,6 +183,8 @@ batteries_y_count=3;
 battery_holder_width=(battery_diameter+battery_holder_spacing)*batteries_x_count+battery_holder_spacing+3*battery_charger_thickness;
 battery_holder_length=(battery_diameter+battery_holder_spacing)*batteries_y_count+battery_holder_spacing;
 battery_holder_height=(battery_height-battery_charger_height)/2;
+battery_holder_mount_offset=8;
+battery_holder_mount_thickness=4;
 
 // Start of trimmer measurements
 trimmer_plus_diameter=16;
