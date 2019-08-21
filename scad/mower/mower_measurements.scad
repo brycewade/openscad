@@ -139,6 +139,7 @@ gps_hole_offset=2.54;
 gps_board_mount_lip=7.5;
 gps_board_mount_lip_thickness=5;
 gps_board_solder_cutout=3.5;
+gps_board_screw_depth=6;
 
 // Start of 40mm fan dimensions
 fan_depth=10.5;

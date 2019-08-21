@@ -6,6 +6,7 @@ include <blade_mount_connector.scad>
 include <front_wheel.scad>
 include <pi_mount.scad>
 include <battery_holder.scad>
+include <gps_mount.scad>
 
 
 visualize=false;
@@ -57,9 +58,9 @@ pi_x=0;
 pi_y=-raspberry_pi_length;
 pi_deg=0;
 
-gps_x=0;
-gps_y=0;
-gps_deg=0;
+gps_x=20+gps_board_x/2+gps_board_mount_lip;
+gps_y=very_front_y-30-gps_board_y/2-gps_board_mount_lip;
+gps_deg=90;
 
 battery_x=0;
 battery_y=very_back_y+section_length/3;
@@ -179,6 +180,12 @@ module all_the_parts(){
             battery_mount_clips();
         }
     }
+    // GPS mount
+    translate([gps_x,gps_y,base_top]){
+        rotate([0,0,gps_deg]){
+            gps_mount();
+        }
+    }
     
 }
 
@@ -258,6 +265,14 @@ module battery_minus(){
     translate([battery_x,battery_y,base_layer1]){
         rotate([0,0,battery_deg]){
             battery_mount_clips_mount_holes();
+        }
+    }
+}
+
+module gps_minus(){
+    translate([gps_x,gps_y,base_layer1]){
+        rotate([0,0,gps_deg]){
+            gps_mount_holes();
         }
     }
 }
@@ -409,6 +424,8 @@ module mount_holes(){
     pi_minus();
     // Mounting holes for the battery mount
     battery_minus();
+    // Mounting holes for the GPS mount
+    gps_minus();
 }
 
 module blade_holes(){
