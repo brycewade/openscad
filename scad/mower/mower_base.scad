@@ -4,6 +4,9 @@ include <blade_driver_mount.scad>
 include <motor_mount.scad>
 include <blade_mount_connector.scad>
 include <front_wheel.scad>
+include <pi_mount.scad>
+include <battery_holder.scad>
+
 
 visualize=false;
 quick=true;
@@ -49,6 +52,18 @@ blade_driver2deg=180;
 blade_driver3x=blade_motor2x+10-(blade_driver_base_pad/2+blade_driver_fan_duct_depth+blade_driver_fan_extension);
 blade_driver3y=blade_motor2y+blade_motor_mount_radius+10+blade_driver_base_pad/2;
 blade_driver3deg=0;
+
+pi_x=0;
+pi_y=-raspberry_pi_length;
+pi_deg=0;
+
+gps_x=0;
+gps_y=0;
+gps_deg=0;
+
+battery_x=0;
+battery_y=very_back_y+section_length/3;
+battery_deg=90;
 
 module screw_hole(x, y, z, length, type, headdepth){
     if(type=="countersunk"){
@@ -111,7 +126,7 @@ module all_the_parts(){
         }
     }
 
-    //Leave this out for now
+    // Blade Drivers
     translate([blade_driver1x,blade_driver1y,base_top]){
         rotate([0,0,blade_driver1deg]){
             if (quick){
@@ -141,6 +156,7 @@ module all_the_parts(){
             }
         }
     }
+    // Blade motor mounts
     translate([blade_motor1x,blade_motor1y,base_top]){
         rotate([0,0,blade_motor1deg]){
             blade_motor_mount_bottom();
@@ -149,6 +165,18 @@ module all_the_parts(){
     translate([blade_motor2x,blade_motor2y,base_top]){
         rotate([0,0,blade_motor2deg]){
             blade_motor_mount_bottom();
+        }
+    }
+    // Raspberry pi mount
+    translate([pi_x,pi_y,base_top]){
+        rotate([0,0,pi_deg]){
+            pi_mount();
+        }
+    }
+    // Battery mount
+    translate([battery_x,battery_y,base_top]){
+        rotate([0,0,battery_deg]){
+            battery_mount_clips();
         }
     }
     
@@ -215,6 +243,22 @@ module blade_drivers_minus(){
     }
     translate([blade_driver3x,blade_driver3y,base_layer1]){
         rotate([0,0,blade_driver3deg]) blade_driver_mounting_holes();
+    }
+}
+
+module pi_minus(){
+    translate([pi_x,pi_y,base_layer1]){
+        rotate([0,0,pi_deg]){
+            pi_mount_holes();
+        }
+    }
+}
+
+module battery_minus(){
+    translate([battery_x,battery_y,base_layer1]){
+        rotate([0,0,battery_deg]){
+            battery_mount_clips_mount_holes();
+        }
     }
 }
 
@@ -361,6 +405,10 @@ module mount_holes(){
     motor_drivers_minus();
     // Mounting holes for the blade driver mounts
     blade_drivers_minus();
+    // Mounting holes for the raspberry pi
+    pi_minus();
+    // Mounting holes for the battery mount
+    battery_minus();
 }
 
 module blade_holes(){

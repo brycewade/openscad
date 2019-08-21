@@ -185,6 +185,7 @@ battery_holder_length=(battery_diameter+battery_holder_spacing)*batteries_y_coun
 battery_holder_height=(battery_height-battery_charger_height)/2;
 battery_holder_mount_offset=8;
 battery_holder_mount_thickness=4;
+battery_holder_mount_basesize=3*screw_head_diameter;
 
 // Start of trimmer measurements
 trimmer_plus_diameter=16;
@@ -324,6 +325,16 @@ side_brace_base_length=side_brace_base_hole+10;
 side_brace_side_length=side_brace_side_hole+10;
 side_brace_width=10;
 side_brace_thickness=4;
+
+// Start of Rasberry Pi measurements
+raspberry_pi_width=56;
+raspberry_pi_length=85;
+raspberry_pi_offset_radius=3.5;
+raspberry_pi_x_holes=[3.5,52.5];
+raspberry_pi_y_holes=[3.5,61.5];
+raspberry_pi_offset=3;
+raspberry_pi_board_thickness=1.35;
+raspberry_pi_base_thickness=10-raspberry_pi_offset-raspberry_pi_board_thickness;
 
 // Common modules
 module m3_nut(){
