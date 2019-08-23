@@ -4,7 +4,7 @@ include <mower_measurements.scad>
 module gps_mount_plus(){
     cube([gps_board_x+2*gps_board_mount_lip,gps_board_y+2*gps_board_mount_lip,gps_board_mount_lip_thickness]);
     translate([gps_board_mount_lip,gps_board_mount_lip,gps_board_mount_lip_thickness]){
-        cube([30,gps_board_y_plus,gps_board_antenna_z]);
+        cube([30,gps_board_y,gps_board_antenna_z]);
     }
     translate([gps_board_x,gps_board_y/2,gps_board_mount_lip_thickness]){
         cube([2*gps_board_mount_lip,2*gps_board_mount_lip,gps_board_antenna_z]);
@@ -16,14 +16,14 @@ module gps_mount_minus(){
     translate([gps_board_mount_lip+2*gps_hole_offset,gps_board_mount_lip,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_solder_cutout]){
         cube([30-2*gps_hole_offset,2*gps_hole_offset,gps_board_solder_cutout]);
     }
-    translate([gps_board_mount_lip+2*gps_hole_offset,gps_board_mount_lip+gps_board_y_plus-2*gps_hole_offset,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_solder_cutout]){
+    translate([gps_board_mount_lip+2*gps_hole_offset,gps_board_mount_lip+gps_board_y-2*gps_hole_offset,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_solder_cutout]){
         cube([30-2*gps_hole_offset,2*gps_hole_offset,gps_board_solder_cutout]);
     }
     // Mounting holes for the gps board
     translate([gps_board_mount_lip+gps_hole_offset,gps_board_mount_lip+gps_hole_offset,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_screw_depth]){
         cylinder(d=screw_diameter, h=gps_board_screw_depth);
     }
-    translate([gps_board_mount_lip+gps_hole_offset,gps_board_mount_lip+gps_board_y_plus-gps_hole_offset,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_screw_depth]){
+    translate([gps_board_mount_lip+gps_hole_offset,gps_board_mount_lip+gps_board_y-gps_hole_offset,gps_board_mount_lip_thickness+gps_board_antenna_z-gps_board_screw_depth]){
         cylinder(d=screw_diameter, h=gps_board_screw_depth);
     }
     // Mounting holes for mount

@@ -64,21 +64,12 @@ module relay_mount_plus(){
     translate([-relay_width/2-relay_wall_thickness,-relay_length/2-relay_wall_thickness,0]){
         cube([relay_width+2*relay_wall_thickness,relay_length+2*relay_wall_thickness,relay_wall_thickness+relay_pin_depth+relay_offset_height]);
     }
-    translate([-relay_width/2-relay_wall_thickness,-relay_length/2+relay_snap_offset,relay_pin_depth+relay_offset_height]){
-        cube([relay_width+2*relay_wall_thickness,relay_unit_length,relay_height]);
-    }
-    translate([0,relay_unit_length/2+relay_snap_offset-relay_length/2,0]){
-        for(rotate=[0,180]){
-            rotate([0,0,rotate]){
-                translate([-relay_width/2-relay_wall_thickness,-relay_unit_length/2,relay_pin_depth+relay_offset_height+relay_height]){
-                    hull(){
-                        cube([relay_wall_thickness+relay_snap_overhang,relay_unit_length,1]);
-                        translate([0,0,relay_snap_height]){
-                            cube([relay_snap_overhang,relay_unit_length,0.01]);
-                        }
-                    }
-                }
-            }
+    hull(){
+        translate([relay_width/2+relay_wall_thickness+screw_head_diameter/2,relay_unit_length/2+relay_snap_offset-relay_length/2,0]){
+            cylinder(d=screw_head_diameter, h=relay_pin_depth+relay_offset_height+relay_height);
+        }
+        translate([-relay_width/2-relay_wall_thickness-screw_head_diameter/2,relay_unit_length/2+relay_snap_offset-relay_length/2,0]){
+            cylinder(d=screw_head_diameter, h=relay_pin_depth+relay_offset_height+relay_height);
         }
     }
 }
@@ -99,6 +90,12 @@ module relay_mount_minus(){
     translate([-relay_width/2,-relay_length/2+relay_support3_stop,0]){
         cube([relay_width,relay_support4_start-relay_support3_stop,relay_pin_depth+relay_offset_height]);
     }
+    translate([relay_width/2+relay_wall_thickness+screw_head_diameter/2,relay_unit_length/2+relay_snap_offset-relay_length/2,relay_pin_depth+relay_offset_height+relay_height-relay_mount_screw_depth]){
+        cylinder(d=screw_diameter, h=relay_mount_screw_depth);
+    }
+    translate([-relay_width/2-relay_wall_thickness-screw_head_diameter/2,relay_unit_length/2+relay_snap_offset-relay_length/2,relay_pin_depth+relay_offset_height+relay_height-relay_mount_screw_depth]){
+        cylinder(d=screw_diameter, h=relay_mount_screw_depth);
+    }
 }
 
 module relay_mount(){
@@ -108,4 +105,87 @@ module relay_mount(){
     }
 }
 
-relay_mount();
+
+module current_sensor_plus(){
+}
+
+module current_sensor_minus(){
+}
+
+module current_sensor(){
+    difference(){
+        current_sensor_plus();
+        current_sensor_minus();
+    }
+}
+
+module voltage_sensor_plus(){
+}
+
+module voltage_sensor_minus(){
+}
+
+module voltage_sensor(){
+    difference(){
+        voltage_sensor_plus();
+        voltage_sensor_minus();
+    }
+}
+
+module dc_to_dc_converter_plus(){
+    difference(){
+        translate([-dc2dcc_width/2-dc2dcc_wall_thickness,-dc2dcc_length/2-dc2dcc_wall_thickness,0]){
+               cube([dc2dcc_width+2*dc2dcc_wall_thickness,dc2dcc_length+2*dc2dcc_wall_thickness,dc2dcc_mount_height+dc2dcc_board_thickness]);
+        }
+        translate([-dc2dcc_width/2,-dc2dcc_length/2,dc2dcc_mount_height-dc2dcc_offset]){
+               cube([dc2dcc_width,dc2dcc_length,dc2dcc_offset+dc2dcc_board_thickness]);
+        }
+    }
+    translate([-dc2dcc_width/2,-dc2dcc_length/2,0]){
+        hull(){
+            for(support=dc2dcc_holes){
+                translate(support){
+                    cylinder(d=screw_head_diameter, h=dc2dcc_mount_height);
+                }
+            }
+        }
+    }
+}
+
+module dc_to_dc_converter_minus(){
+    translate([-dc2dcc_width/2,-dc2dcc_length/2,0]){
+        for(support=dc2dcc_holes){
+            translate(support){
+                cylinder(d=screw_diameter, h=dc2dcc_mount_height);
+            }
+        }
+    }
+}
+
+module dc_to_dc_converter(){
+    rotate([0,0,180]){
+        difference(){
+            dc_to_dc_converter_plus();
+            dc_to_dc_converter_minus();
+        }
+    }
+}
+
+module misc_mount_plus(){
+    rtc_x=rtc_width/2+rtc_wall_thickness;
+    relay_x=rtc_x+rtc_width/2+rtc_wall_thickness+5+relay_width/2+relay_wall_thickness+screw_head_diameter;
+    dc2dcc_x=relay_x+relay_width/2+relay_wall_thickness+screw_head_diameter+5+dc2dcc_width/2+dc2dcc_wall_thickness;
+    
+    rtc_y=0;
+    relay_y=0;
+    dc2dcc_y=0;
+    
+    translate([rtc_x,rtc_y,0]) rtc_mount();
+    translate([relay_x, relay_y,0]) relay_mount();
+    translate([dc2dcc_x, dc2dcc_y,0]) dc_to_dc_converter();
+//    translate([voltage_x,voltage_y,0]) voltage_sensor();
+//    translate([current_x, current_y,0]) current_sensor();
+}
+
+
+misc_mount_plus();

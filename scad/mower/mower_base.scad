@@ -7,6 +7,7 @@ include <front_wheel.scad>
 include <pi_mount.scad>
 include <battery_holder.scad>
 include <gps_mount.scad>
+include <arduino_mount.scad>
 
 
 visualize=false;
@@ -65,6 +66,10 @@ gps_deg=90;
 battery_x=0;
 battery_y=very_back_y+section_length/3;
 battery_deg=90;
+
+arduino_x=base_width/3;
+arduino_y=very_front_y-50-mega_length;
+arduino_deg=90;
 
 module screw_hole(x, y, z, length, type, headdepth){
     if(type=="countersunk"){
@@ -186,7 +191,12 @@ module all_the_parts(){
             gps_mount();
         }
     }
-    
+    // Arduino mount
+    translate([arduino_x,arduino_y,base_top]){
+        rotate([0,0,arduino_deg]){
+            arduino_base();
+        }
+    }    
 }
 
 module plus(){
@@ -239,12 +249,9 @@ module motor_drivers_minus(){
 }
 
 module blade_drivers_minus(){
-    /*
-    // Leave this out for now
     translate([blade_driver1x,blade_driver1y,base_layer1]){
         rotate([0,0,blade_driver1deg]) blade_driver_mounting_holes();
     }
-    */
     translate([blade_driver2x,blade_driver2y,base_layer1]){
         rotate([0,0,blade_driver2deg]) blade_driver_mounting_holes();
     }
@@ -273,6 +280,14 @@ module gps_minus(){
     translate([gps_x,gps_y,base_layer1]){
         rotate([0,0,gps_deg]){
             gps_mount_holes();
+        }
+    }
+}
+
+module aduino_minus(){
+    translate([arduino_x,arduino_y,base_layer1]){
+        rotate([0,0,arduino_deg]){
+            arduino_base_mounting_holes();
         }
     }
 }
@@ -413,6 +428,32 @@ module base_holes(){
     screw_hole(x8-base_screw_offset, y12-base_screw_offset, base_top, base_screw_length, "socket", base_top);
 }
 
+module side_mount_holes(){
+    side_mount_holes=[
+        // Center very back
+        [0,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+        // Rear mount corners
+        [-base_width/2+wheel_height+base_wheel_buffer_x+side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+        [base_width/2-wheel_height-base_wheel_buffer_x-side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1]
+    ];
+    for(hole=side_mount_holes){
+        translate(hole) m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
+    }
+}
+
+module motor_mount_brace_holes(){
+    left_origin=-base_width/2+wheel_motor_mount_height+wheel_height+base_wheel_buffer_x+wheel_mount_screw_height;
+    right_origin=base_width/2-wheel_motor_mount_height-wheel_height-base_wheel_buffer_x-wheel_mount_screw_height;
+    center_y=very_back_y+1.5*wheel_motor_mount_width;
+    for(x=[left_origin-wheel_motor_mount_height/4,left_origin-wheel_motor_mount_height*3/4,right_origin+wheel_motor_mount_height/4,right_origin+wheel_motor_mount_height*3/4]){
+        for(y=[center_y-wheel_motor_mount_width/2-wheel_motor_mount_rail_depth-side_brace_base_hole,center_y+wheel_motor_mount_width/2+wheel_motor_mount_rail_depth+side_brace_base_hole]){
+            translate([x,y,base_layer1]){
+                m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
+            }
+        }
+    }
+}
+
 module mount_holes(){
     // mounting holes for the blade motors
     blade_motors_minus();
@@ -426,6 +467,12 @@ module mount_holes(){
     battery_minus();
     // Mounting holes for the GPS mount
     gps_minus();
+    // Mounting holes for the Arduino
+    aduino_minus();
+    // Side mount holes
+    side_mount_holes();
+    // Motor mount holes
+    motor_mount_brace_holes();
 }
 
 module blade_holes(){

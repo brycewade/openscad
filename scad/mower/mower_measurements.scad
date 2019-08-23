@@ -139,7 +139,7 @@ gps_hole_offset=2.54;
 gps_board_mount_lip=7.5;
 gps_board_mount_lip_thickness=5;
 gps_board_solder_cutout=3.5;
-gps_board_screw_depth=6;
+gps_board_screw_depth=9;
 
 // Start of 40mm fan dimensions
 fan_depth=10.5;
@@ -270,6 +270,7 @@ relay_wall_thickness=rtc_wall_thickness;
 relay_snap_offset=14.05;
 relay_snap_overhang=1;
 relay_snap_height=6;
+relay_mount_screw_depth=8;
 
 // Start voltage sensor measurements
 voltage_sensor_width=13.26;
@@ -297,6 +298,17 @@ nano_pin_offset=2.55;
 nano_board_height=1.75*1.5;
 nano_mount_thickness=8;
 nano_offset_height=1;
+
+// Start of DC to DC converter measurements
+dc2dcc_width=21.25;
+dc2dcc_length=43;
+dc2dcc_wall_thickness=rtc_wall_thickness;
+dc2dcc_offset=3;
+dc2dcc_holes=[[2.1,5.9,0],[dc2dcc_width-2.6,dc2dcc_length-6.2,0]];
+dc2dcc_mount_height=8;
+dc2dcc_board_thickness=1.33;
+
+
 
 // Start blade mount connector measurements
 blade_mount_connector_outter_diameter=26;
@@ -327,6 +339,9 @@ side_brace_side_length=side_brace_side_hole+10;
 side_brace_width=10;
 side_brace_thickness=4;
 
+// Start of side wall measurements
+side_wall_thickness=4;
+
 // Start of Rasberry Pi measurements
 raspberry_pi_width=56;
 raspberry_pi_length=85;
@@ -335,7 +350,17 @@ raspberry_pi_x_holes=[3.5,52.5];
 raspberry_pi_y_holes=[3.5,61.5];
 raspberry_pi_offset=3;
 raspberry_pi_board_thickness=1.35;
-raspberry_pi_base_thickness=10-raspberry_pi_offset-raspberry_pi_board_thickness;
+raspberry_pi_base_thickness=16-base_second_layer_thickness-raspberry_pi_offset-raspberry_pi_board_thickness;
+
+// Start Arduino Mega measurements
+mega_width=53.34;
+mega_length=101.6;
+mega_holes=[[13.97,2.54,0],[66.04,35.56,0],[96.52,2.54,0]];
+mega_offsets=[[15.24,50.8,0],[66.04,7.62,0],[90.17,50.8,0]];
+mega_board_thickness=1.6;
+mega_base_thickness=4;
+mega_board_offset=16-base_second_layer_thickness-mega_base_thickness-mega_board_thickness;
+mega_offset_radius=2.54;
 
 // Common modules
 module m3_nut(){
