@@ -8,10 +8,11 @@ include <pi_mount.scad>
 include <battery_holder.scad>
 include <gps_mount.scad>
 include <arduino_mount.scad>
+include <misc_mounts.scad>
 
 
 visualize=false;
-quick=true;
+quick=false;
 
 back_y=-total_blade_radius-blade_y_offset-blade_gap-base_wall_thickness;
 very_back_y=back_y-3*wheel_motor_mount_width;
@@ -56,7 +57,7 @@ blade_driver3y=blade_motor2y+blade_motor_mount_radius+10+blade_driver_base_pad/2
 blade_driver3deg=0;
 
 pi_x=0;
-pi_y=-raspberry_pi_length;
+pi_y=-raspberry_pi_length-30;
 pi_deg=0;
 
 gps_x=20+gps_board_x/2+gps_board_mount_lip;
@@ -70,6 +71,22 @@ battery_deg=90;
 arduino_x=base_width/3;
 arduino_y=very_front_y-50-mega_length;
 arduino_deg=90;
+
+compass_x=arduino_x-10;
+compass_y=very_front_y-40+compass_length/2;
+compass_deg=0;
+
+12v_mount_x=25;
+12v_mount_y=0;
+12v_mount_deg=90;
+
+5v_mount_x=-75;
+5v_mount_y=10;
+5v_mount_deg=0;
+
+nano_mount_x=55;
+nano_mount_y=very_front_y-35-mega_length;
+nano_mount_deg=0;
 
 module screw_hole(x, y, z, length, type, headdepth){
     if(type=="countersunk"){
@@ -108,7 +125,9 @@ module cutout(){
 }
 
 module quick_cutout(){
-    cylinder(d=blade_mount_connector_outter_diameter+4, h=base_top);
+    //cylinder(d=blade_mount_connector_outter_diameter+4, h=base_top);
+    
+    cylinder(r=blade_mount_inner_screw_radius+m4_nut_diameter/2+2*blade_buffer, h=base_top);
     cylinder(r=total_blade_radius+blade_gap+base_blade_rounding_radius,h=base_blade_indent_height);
 }
 
@@ -196,7 +215,31 @@ module all_the_parts(){
         rotate([0,0,arduino_deg]){
             arduino_base();
         }
-    }    
+    }
+    // Compass mount
+    translate([compass_x,compass_y,base_top]){
+        rotate([0,0,compass_deg]){
+            compass();
+        }
+    }
+    // 12v component mount
+    translate([12v_mount_x,12v_mount_y,base_top]){
+        rotate([0,0,12v_mount_deg]){
+            12v_mount();
+        }
+    }
+    // 5v component mount
+    translate([5v_mount_x,5v_mount_y,base_top]){
+        rotate([0,0,5v_mount_deg]){
+            5v_mount();
+        }
+    }
+    // nano mount
+    translate([nano_mount_x,nano_mount_y,base_top]){
+        rotate([0,0,nano_mount_deg]){
+            nano_mount_base();
+        }
+    }
 }
 
 module plus(){
@@ -288,6 +331,38 @@ module aduino_minus(){
     translate([arduino_x,arduino_y,base_layer1]){
         rotate([0,0,arduino_deg]){
             arduino_base_mounting_holes();
+        }
+    }
+}
+
+module compass_holes_minus(){
+    translate([compass_x,compass_y,base_layer1]){
+        rotate([0,0,compass_deg]){
+            compass_mounting_holes();
+        }
+    }
+}
+
+module 12v_holes_minus(){
+    translate([12v_mount_x,12v_mount_y,base_layer1]){
+        rotate([0,0,12v_mount_deg]){
+            12v_mount_holes();
+        }
+    }
+}
+
+module 5v_holes_minus(){
+    translate([5v_mount_x,5v_mount_y,base_layer1]){
+        rotate([0,0,5v_mount_deg]){
+            5v_mount_holes();
+        }
+    }
+}
+
+module nano_holes_minus(){
+    translate([nano_mount_x,nano_mount_y,base_layer1]){
+        rotate([0,0,nano_mount_deg]){
+            nano_mount_base_holes();
         }
     }
 }
@@ -426,15 +501,54 @@ module base_holes(){
     screw_hole(x6, y12, base_top, base_screw_length, "socket", base_top);
     screw_hole(x7, y12, base_top, base_screw_length, "socket", base_top);
     screw_hole(x8-base_screw_offset, y12-base_screw_offset, base_top, base_screw_length, "socket", base_top);
+    //Front wheel mount holes
+    screw_hole(-base_width/4+35, very_front_y+base_screw_offset, base_top, base_screw_length, "countersunk", base_top);
+    screw_hole(base_width/4-35, very_front_y+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+    screw_hole(-base_screw_offset, very_front_y+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+    screw_hole(base_screw_offset, very_front_y+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+    translate([0,very_front_y+front_mount_base_legy,0]){
+        rotate([0,0,-130]){
+            screw_hole(0, front_mount_radius+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+        }
+        rotate([0,0,-230]){
+            screw_hole(0, front_mount_radius+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+        }
+    }
 }
 
+module front_wheel_mount_holes(){
+    translate([0,very_front_y+front_mount_base_legy,0]){
+        for(deg=[-front_wheel_mount_angle_offset,front_wheel_mount_angle_offset]){
+            rotate([0,0,180+deg]){
+                translate([0, front_mount_radius+base_screw_offset+side_brace_base_hole,base_layer1]){
+                    m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
+                }
+            }
+        }
+    }
+}
 module side_mount_holes(){
     side_mount_holes=[
         // Center very back
         [0,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
-        // Rear mount corners
-        [-base_width/2+wheel_height+base_wheel_buffer_x+side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
-        [base_width/2-wheel_height-base_wheel_buffer_x-side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1]
+//        // Rear mount corners (probably a special brace)
+//        [-base_width/2+wheel_height+base_wheel_buffer_x+side_wall_thickness+side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+//        [base_width/2-wheel_height-base_wheel_buffer_x-side_wall_thickness-side_brace_base_hole,very_back_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+//        // Just in front of the motor mounts (probably a special brace)
+//        [-base_width/2+wheel_height+base_wheel_buffer_x+side_wall_thickness+side_brace_base_hole,very_back_y+1.5*wheel_motor_mount_width+wheel_motor_mount_width/2+wheel_motor_mount_rail_depth+side_brace_base_hole,base_layer1],
+//        [base_width/2-wheel_height-base_wheel_buffer_x-side_wall_thickness-side_brace_base_hole,very_back_y+1.5*wheel_motor_mount_width+wheel_motor_mount_width/2+wheel_motor_mount_rail_depth+side_brace_base_hole,base_layer1],
+        // Just inside the front of the wheel cutouts
+        [-base_width/2+wheel_height+base_wheel_buffer_x+side_wall_thickness+side_brace_base_hole,very_back_y+section_length-base_screw_offset,base_layer1],
+        [base_width/2-wheel_height-base_wheel_buffer_x-side_wall_thickness-side_brace_base_hole,very_back_y+section_length-base_screw_offset,base_layer1],
+        // Corner just in front of the wheels
+        [-base_width/2+side_wall_thickness+side_brace_base_hole,very_back_y+1.5*wheel_motor_mount_width+wheel_radius+base_wheel_buffer_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+        [base_width/2-side_wall_thickness-side_brace_base_hole,very_back_y+1.5*wheel_motor_mount_width+wheel_radius+base_wheel_buffer_y+side_wall_thickness+side_brace_base_hole,base_layer1],
+        // Midway between wheels and trimmer
+        [-base_width/2+side_wall_thickness+side_brace_base_hole,very_back_y+2*section_length,base_layer1],
+        [base_width/2-side_wall_thickness-side_brace_base_hole,very_back_y+2*section_length,base_layer1],
+        // Just back of the front right curve
+        [base_width/2-side_wall_thickness-side_brace_base_hole,very_front_y-base_front_curve_radius-side_brace_width/2,base_layer1],
+        [base_width/2-base_front_curve_radius-side_brace_width/2,very_front_y-side_wall_thickness-side_brace_base_hole,base_layer1]
     ];
     for(hole=side_mount_holes){
         translate(hole) m3_nut_plus_bolt(base_mounting_screw_length, base_mounting_nut_depth);
@@ -469,10 +583,20 @@ module mount_holes(){
     gps_minus();
     // Mounting holes for the Arduino
     aduino_minus();
+    // Mounting holes for the compass
+    compass_holes_minus();
+    // Mounting holes for the 12v components
+    12v_holes_minus();
+    // Mounting holes for the 5v components
+    5v_holes_minus();
+    // Nano mounting holes
+    nano_holes_minus();
     // Side mount holes
     side_mount_holes();
     // Motor mount holes
     motor_mount_brace_holes();
+    // Front wheel mount holes
+    front_wheel_mount_holes();
 }
 
 module blade_holes(){
@@ -552,6 +676,12 @@ module rounded_edge(r,l){
     }
 }
 
+module blade(){
+    translate([-cutting_blade_depth/2,-cutting_blade_width,0]){ 
+        cube([cutting_blade_depth,cutting_blade_width,cutting_blade_length]);
+    }
+}
+
 module trimmer_cutout(){
     echo("trimmer x", base_width/2-base_front_curve_radius);
     echo("blade x", blade_x_offset/2);
@@ -566,11 +696,14 @@ module trimmer_cutout(){
         translate([-base_width/2+base_front_curve_radius,trimmer_y_offset-blade_y_offset,trimmer_z_offset]){
             cylinder(r=trimmer_radius+blade_gap,h=base_top-trimmer_z_offset);
         }
-        translate([-base_width/2+base_front_curve_radius,very_front_y,trimmer_z_offset]){
-            rotate([0,90,0]){
-                rotate([0,0,180]){
-                    rounded_edge(base_top-trimmer_z_offset,trimmer_radius);
-                }
+        translate([0,very_front_y,trimmer_z_offset]){
+                    front_left_wheel_mount_bevel(0,front_wheel_mount_back_circle_offset-wheel_motor_bearing_outer_diameter/2,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
+        }
+    }
+    translate([-base_width/2+base_front_curve_radius,trimmer_y_offset-blade_y_offset,trimmer_z_offset]){
+        rotate([0,0,45]){
+            translate([trimmer_radius,0,0]){
+                blade();
             }
         }
     }
@@ -582,6 +715,7 @@ module minus(){
     wheel_slots();
     trimmer_cutout();
     base_holes();
+    mount_holes();
 }
 
 
@@ -631,20 +765,14 @@ echo("Wheel center=",1.5*wheel_motor_mount_width);
 echo("Blades are in ", (base_width-blade_x_offset)/2, "mm from the side");
 echo("blades are offset ", blade_y_offset, "mm from each other");
 
-/*
-for(x=[0,1]){
-    for(y=[0:2]){
-        translate([5*x,5*y,0]){
-            bottom_part(x,y);
-        }
-    }
-}
-
-for(x=[-0.5:1.5]){
-    for(y=[-0.5:2.5]){
-        translate([10*x,10*y,base_layer1+50]){
-            top_part(x,y);
-        }
-    }
-}
-*/
+//intersection(){
+//    difference(){
+//        translate([0,very_front_y,0]){
+//            wheel_pivot_base_mount();
+//        }
+//        base_holes();
+//        front_wheel_mount_holes();
+//        trimmer_cutout();
+//    }
+//    translate([-base_width/2,very_front_y,0]) cube([base_width,500,base_layer1]);
+//}

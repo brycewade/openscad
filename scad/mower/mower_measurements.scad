@@ -36,6 +36,10 @@ wheel_mount_screw_height=12;
 wheel_mount_screw_depth=wheel_mount_screw_height-wheel_screw_depth+2;
 wheel_mount_total_height=wheel_motor_bearing_width+1+wheel_mount_height;
 
+// Start of m2 screw dimensions
+m2_screw_diameter=1.95;
+m2_screw_head_diameter=3.5;
+m2_screw_head_height=2;
 
 // Start of m3 screw dimensions
 screw_diameter=3;
@@ -108,6 +112,30 @@ base_wheel_buffer_x=5;
 base_wheel_buffer_y=10;
 base_screw_offset=10;
 
+// Start of distance sensor measurements
+distance_sensor_board_width=20.34;
+distance_sensor_board_length=45.43;
+distance_sensor_board_depth=1.5;
+distance_sensor_component_depth=1.9;
+distance_sensor_oscillator_depth=3;
+distance_sensor_oscillator_diameter=4.55;
+distance_sensor_oscillator_length=11;
+distance_sensor_oscillator_x_offset=0.65;
+distance_sensor_oscillator_center_x=(distance_sensor_board_width-distance_sensor_oscillator_diameter)/2-distance_sensor_oscillator_x_offset;
+distance_sensor_oscillator_center_y=(distance_sensor_oscillator_length-distance_sensor_oscillator_diameter)/2;
+distance_sensor_tranducer_diameter=16;
+distance_sensor_tranducer_depth=12.25;
+distance_sensor_tranducer_distance=10;
+distance_sensor_tranducer_center_y=(distance_sensor_tranducer_diameter+distance_sensor_tranducer_distance)/2;
+distance_sensor_pin_depth=4.9;
+distance_sensor_pin_length=10;
+distance_sensor_pin_base_width=2.5;
+distance_sensor_pin_width=8.75;
+distance_sensor_pin_diameter=0.66;
+distance_sensor_hole_x_offsets=16.5/2;
+distance_sensor_hole_y_offsets=41/2;
+distance_sensor_hole_diameter=2;
+
 // Start of front wheel dimensions
 front_wheel_prism_height=7;
 front_wheel_prism_width=3;
@@ -128,7 +156,13 @@ front_mount_radius=sqrt(front_mount_x*front_mount_x+front_mount_y*front_mount_y)
 // Figure out where base side of the front wheel mount
 front_mount_base_legx=-base_width/2+base_front_curve_radius;
 front_mount_base_hypotnuse=front_mount_radius+trimmer_radius;
-front_mount_base_legy=sqrt(front_mount_base_hypotnuse*front_mount_base_hypotnuse-front_mount_base_legx*front_mount_base_legx)-base_front_curve_radius;
+front_mount_base_legy=sqrt(front_mount_base_hypotnuse*front_mount_base_hypotnuse-front_mount_base_legx*front_mount_base_legx)-base_front_curve_radius+10;
+front_wheel_mount_back_circle_offset=front_mount_radius-wheel_motor_bearing_outer_diameter/2-base_wall_thickness;
+front_wheel_mount_distance_sensor_offset=sqrt(front_mount_radius*front_mount_radius-distance_sensor_board_length*distance_sensor_board_length/4)-distance_sensor_board_depth-front_wheel_mount_back_circle_offset;
+front_wheel_mount_angle_offset=30;
+cutting_blade_length=34.5;
+cutting_blade_width=18;
+cutting_blade_depth=0.75;
 
 // Start of GPS mount dimensions
 gps_board_x=43.8;
@@ -234,8 +268,15 @@ blade_driver_base_solder_standoff=1.6;
 blade_driver_heatsink_standoff=0.5;
 
 // Start compass measurements
-compass_width=13.62;
-compass_length=14.5;
+compass_length=13.62;
+compass_width=14.5;
+compass_depth=3.4;
+compass_pins_width=3;
+compass_pins_depth=2.5;
+compass_wall_thickness=2.5;
+compass_mount_screw_depth=8;
+compass_mount_x_offset=compass_width/2+1.5*screw_head_diameter;
+compass_mount_y_offset=compass_length/2+1.5*m2_screw_head_diameter;
 
 // Start real time clock measurements
 rtc_width=23;
@@ -275,18 +316,24 @@ relay_mount_screw_depth=8;
 // Start voltage sensor measurements
 voltage_sensor_width=13.26;
 voltage_sensor_length=26.8;
-voltage_sensor_pin_depth=2.32;
+voltage_sensor_depth=1.6;
+voltage_sensor_pin_depth=2.5;
 voltage_sensor_mounting_hole_diameter=3.1;
 voltage_sensor_mounting_cylinder_diameter=8.4;
-voltage_sensor_mounting_hole_x_offset=11.42;
+voltage_sensor_mounting_hole_y_offset=11.42+voltage_sensor_mounting_hole_diameter/2;
+voltage_sensor_wall_thickness=rtc_wall_thickness;
+voltage_sensor_mount_screw_depth=8;
 
 // Start current sensor measurements
 current_sensor_width=12.91;
-current_sensor_lenght=31.75;
+current_sensor_length=31.75;
+current_sensor_depth=3.15;
 current_sensor_pin_depth=1.94;
 current_sensor_mounting_hole_diameter=3;
-current_sensor_mounting_hole_inner_distance=6.1;
-current_sensor_mounting_hole_x_offset=16.04;
+current_sensor_mounting_hole_distance=6+current_sensor_mounting_hole_diameter;
+current_sensor_mounting_hole_y_offset=16.04;
+current_sensor_wall_thickness=rtc_wall_thickness;
+current_sensor_mount_screw_depth=8;
 
 // Start Nano measurements
 nano_width=18.21;
@@ -336,7 +383,7 @@ side_brace_base_hole=20;
 side_brace_side_hole=25;
 side_brace_base_length=side_brace_base_hole+10;
 side_brace_side_length=side_brace_side_hole+10;
-side_brace_width=10;
+side_brace_width=15;
 side_brace_thickness=4;
 
 // Start of side wall measurements
@@ -361,6 +408,8 @@ mega_board_thickness=1.6;
 mega_base_thickness=4;
 mega_board_offset=16-base_second_layer_thickness-mega_base_thickness-mega_board_thickness;
 mega_offset_radius=2.54;
+
+misc_mount_base_thickness=4;
 
 // Common modules
 module m3_nut(){
@@ -410,6 +459,60 @@ module prism(l, w, h) {
        ]);
 }
 
+module arc(r, theta){
+    difference(){
+        intersection(){
+            circle(r=r);
+            square([r,r]);
+        }
+        rotate([0,0,theta]){
+            square([r,r]);
+        }
+    }
+}
+
+module half_curve(r, theta, yp){
+    arc(r, theta);
+    intersection(){
+        rotate([0,0,theta]){
+            square([r,yp]);
+        }
+        square([r,yp]);
+    }
+}
+
+module curved_joint(a,b,c,d,r0,r1,signmult){
+    xp=(c*r0+a*r1)/(r0+r1);
+    yp=(d*r0+b*r1)/(r0+r1);
+    
+//    r02yp=r0*r0*(yp-b);
+    root=sqrt((xp-a)*(xp-a)+(yp-b)*(yp-b)-r0*r0);
+//    r0xproot=r0*(xp-a)*root;
+//    signmult=r02yp>r0xproot ? 1:-1;
+    
+    x12=(r0*r0*(xp-a)+signmult*r0*(yp-b)*sqrt((xp-a)*(xp-a)+(yp-b)*(yp-b)-r0*r0))/((xp-a)*(xp-a)+(yp-b)*(yp-b))+a;
+    y12=(r0*r0*(yp-b)-signmult*r0*(xp-a)*sqrt((xp-a)*(xp-a)+(yp-b)*(yp-b)-r0*r0))/((xp-a)*(xp-a)+(yp-b)*(yp-b))+b;
+    
+    echo("root = ",root);
+    echo("xp,yp = ",xp, yp);
+    echo("x12 = ", x12);
+    echo("y12 = ", y12);
+    theta=atan((y12-b)/(x12-a));
+    echo("Theta=", theta);
+    translate([a,b,0]){
+        half_curve(r0, theta, yp-b);
+        difference(){
+            translate([0,yp-b,0]){
+                square([r1,yp-b]);
+            }
+            translate([c-a,d-b,0]){
+                rotate([0,0,180]){
+                    half_curve(r1, theta, yp-b);
+                }
+            }
+        }
+    }
+}
 deck_height=(wheel_diameter-wheel_motor_diameter)/2;
 echo("Deck height = ", deck_height/10, " cm");
 echo("Deck height = ", deck_height/25.4, " inches");
