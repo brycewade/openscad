@@ -390,7 +390,7 @@ module front_wheel_mount_base(){
     linear_extrude(height=base_thickness+base_blade_indent_height+base_second_layer_thickness){
         for(mir=[0,1]){
             mirror([mir,0,0]){
-                front_right_wheel_mount(0,front_wheel_mount_back_circle_offset-wheel_motor_bearing_outer_diameter/2,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
+                front_right_wheel_mount(0,front_wheel_mount_back_circle_offset,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
             }
         }
     }
@@ -409,3 +409,9 @@ module wheel_pivot_base_mount(){
         }
     }
 }
+//wheel_pivot_base_mount();
+////pivot_and_wheels();
+//translate([0,front_mount_base_legy,0]){
+//    rotate([0,0,-90]) wheel_pivot_mount();
+//}
+wheel_pivot_mount();
