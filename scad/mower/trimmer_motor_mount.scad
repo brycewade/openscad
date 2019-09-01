@@ -2,8 +2,16 @@ include <mower_measurements.scad>
 include <distance_sensor.scad>
 $fn=360;
 
+back_y=-total_blade_radius-blade_y_offset-blade_gap-base_wall_thickness;
+very_back_y=back_y-3*wheel_motor_mount_width;
+front_y=back_y+base_blade_indent_length;
+very_front_y=trimmer_y_offset-blade_y_offset+base_front_curve_radius;
+base_layer1=base_thickness+base_blade_indent_height;
+base_top=base_layer1+base_second_layer_thickness;
+front_mount_base_y=very_front_y+front_mount_base_legy;
 
-
+section_width=base_width/2;
+section_length=(very_front_y-very_back_y)/3;
 
 module curved_enclosure(r0, r1, height, thickness){
     radius=r1-r0<height/2?r1-r0:height/2;
@@ -50,7 +58,40 @@ module distance_sensors(){
     }
 }
 
+//difference(){
+//    hull(){
+//        cylinder(d=blade_motor_diameter+2*base_wall_thickness,h=base_wall_thickness);
+//        translate([-base_width/8,-section_length/4,115-22]){
+//            cube([base_width/4,section_length/2,base_second_layer_thickness]);
+//        }
+//    }
+//    translate([0,0,base_wall_thickness]){
+//        cylinder(r=base_front_curve_radius+5,h=115);
+//    }
+//}
+
 difference(){
-shell();
-distance_sensors();
+    hull(){
+        translate([base_front_curve_radius,base_front_curve_radius,0]){
+            cylinder(d=blade_motor_diameter+2*base_wall_thickness,h=base_wall_thickness);
+        }
+        translate([base_front_curve_radius-blade_motor_diameter/2-base_wall_thickness,0,0]){
+            cube([section_length/2-(base_front_curve_radius-blade_motor_diameter/2-base_wall_thickness),base_front_curve_radius,base_wall_thickness]);
+        }
+        translate([base_front_curve_radius,0,0]){
+            cube([section_length/2-base_front_curve_radius,base_front_curve_radius+blade_motor_diameter/2+base_wall_thickness,base_wall_thickness]);
+        }
+        translate([0,0,93]){
+            cube([base_width/4,section_length/2,base_second_layer_thickness]);
+        }
+    }
+    translate([base_front_curve_radius,base_front_curve_radius,base_wall_thickness]){
+        cylinder(d1=blade_motor_diameter+2*base_wall_thickness,d2=trimmer_diameter,h=35);
+    }
+    translate([base_front_curve_radius,base_front_curve_radius,base_wall_thickness+35]){
+        cylinder(d1=trimmer_diameter,r2=base_front_curve_radius+5,h=95-35);
+    }
+    translate([0,base_front_curve_radius,base_wall_thickness]){
+        cube([base_front_curve_radius,base_front_curve_radius,95]);
+    }
 }
