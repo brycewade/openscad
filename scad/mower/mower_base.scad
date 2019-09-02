@@ -511,7 +511,7 @@ module base_holes(){
             screw_hole(0, front_mount_radius+base_screw_offset, base_top, base_screw_length, "socket", base_top);
         }
         rotate([0,0,-230]){
-            screw_hole(0, front_mount_radius+base_screw_offset, base_top, base_screw_length, "socket", base_top);
+            screw_hole(0, front_mount_radius+base_screw_offset, base_top, base_screw_length, "countersunk", base_top);
         }
     }
 }
@@ -697,11 +697,11 @@ module trimmer_cutout(){
             cylinder(r=trimmer_radius+blade_gap,h=base_top-trimmer_z_offset);
         }
         translate([0,very_front_y,trimmer_z_offset]){
-                    front_left_wheel_mount_bevel(0,front_wheel_mount_back_circle_offset-wheel_motor_bearing_outer_diameter/2,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
+                    front_left_wheel_mount_bevel(0,front_wheel_mount_back_circle_offset,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
         }
     }
     translate([-base_width/2+base_front_curve_radius,trimmer_y_offset-blade_y_offset,trimmer_z_offset]){
-        rotate([0,0,45]){
+        rotate([0,0,48]){
             translate([trimmer_radius,0,0]){
                 blade();
             }

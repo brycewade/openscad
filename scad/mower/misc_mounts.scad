@@ -462,3 +462,40 @@ module nano_mount_base(){
     }
 }
 
+module power_distribution_mount_plus(){
+    translate([-power_width/2,0,0]){
+        cube([power_width,power_length,power_height]);
+    }
+    for(y=[0,power_length]){
+        translate([0,y,0]){
+            cylinder(d=screw_head_diameter,h=6);
+        }
+    }
+}
+
+module power_distribution_mount_minus(){
+    translate([-power_brass_width/2,misc_mount_base_thickness,power_height-misc_mount_base_thickness]){
+        cube([power_brass_width,power_length-2*misc_mount_base_thickness,misc_mount_base_thickness]);
+    }
+    for(y=[0:power_holes-1]){
+        translate([0,power_screw_spacing[y]+power_screw_diameter/2+misc_mount_base_thickness+power_spacing/2+1,0]){
+            cylinder(d=power_screw_diameter, h=power_height);
+        }
+    }
+    for(y=[0,power_length]){
+        translate([0,y,0]){
+            cylinder(d=screw_diameter,h=6);
+        }
+        translate([0,y,6]){
+            cylinder(d=screw_head_diameter,h=power_height-6);
+        }
+    }
+}
+
+module power_distribution_mount(){
+    difference(){
+        power_distribution_mount_plus();
+        power_distribution_mount_minus();
+    }
+}
+//power_distribution_mount();

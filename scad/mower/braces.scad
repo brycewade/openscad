@@ -34,6 +34,7 @@ module nut_hole(){
     }
 }
 
+
 module side_brace_minus(){
     translate([0,side_brace_base_hole,0]){
         cylinder(d=screw_diameter,h=side_brace_thickness);
@@ -48,6 +49,25 @@ module side_brace_minus(){
     }
 }
 
+module m3_bolt_cutout(){
+    translate([0,0,-20]){
+        cylinder(d=screw_head_diameter,h=20);
+    }
+    m3_bolt(8);
+}
+module motor_brace_minus(){
+    translate([0,side_brace_base_hole,4+screw_head_height]){
+        rotate([0,180,0]){
+            m3_bolt_cutout();
+        }
+    }
+    translate([0,4+screw_head_height,side_brace_side_hole]){
+        rotate([90,0,0]){
+            m3_bolt_cutout();
+        }
+    }
+}
+
 module side_brace(){
     difference(){
         side_brace_plus();
@@ -55,4 +75,10 @@ module side_brace(){
     }
 }
 
-side_brace();
+module motor_brace(){
+    difference(){
+        side_brace_plus();
+        motor_brace_minus();
+    }
+}
+

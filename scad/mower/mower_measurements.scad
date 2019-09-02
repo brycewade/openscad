@@ -160,6 +160,8 @@ front_mount_base_legy=sqrt(front_mount_base_hypotnuse*front_mount_base_hypotnuse
 front_wheel_mount_back_circle_offset=front_mount_radius-wheel_motor_bearing_outer_diameter/2-base_wall_thickness;
 front_wheel_mount_distance_sensor_offset=sqrt(front_mount_radius*front_mount_radius-distance_sensor_board_length*distance_sensor_board_length/4)-distance_sensor_board_depth-front_wheel_mount_back_circle_offset;
 front_wheel_mount_angle_offset=30;
+front_wheel_motor_mount_rail_depth=4+screw_head_height+nut_height*1.1;
+//front_wheel_motor_mount_rail_depth=wheel_motor_mount_rail_depth;
 cutting_blade_length=34.5;
 cutting_blade_width=18;
 cutting_blade_depth=0.75;
@@ -410,6 +412,17 @@ mega_board_offset=16-base_second_layer_thickness-mega_base_thickness-mega_board_
 mega_offset_radius=2.54;
 
 misc_mount_base_thickness=4;
+power_brass_width=12.8;
+power_brass_height=1;
+power_screw_diameter=3.9;
+power_spacing=11;
+power_holes=7;
+power_screw_spacing=[-power_screw_diameter/2,7.45,18.45,29.79,40.82,52.58,63.39];
+power_screw_length=8;
+power_height=power_screw_length+2;
+power_width=power_brass_width+2*misc_mount_base_thickness;
+power_length=power_screw_spacing[power_holes-1]+power_spacing+power_screw_diameter/2+2*misc_mount_base_thickness+2;
+echo("power_length", power_length);
 
 // Common modules
 module m3_nut(){

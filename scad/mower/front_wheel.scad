@@ -153,30 +153,27 @@ module wheel_pivot(){
 }
 
 module pivot_mount_rail_slot(){
-    translate([front_mount_radius-2,-wheel_motor_mount_rail_width/2,0]){
-        cube([wheel_motor_mount_rail_width,wheel_motor_mount_rail_depth,wheel_motor_mount_rail_height]);
+    translate([front_mount_radius-1,-wheel_motor_mount_rail_width/2,0]){
+        cube([front_wheel_motor_mount_rail_depth,wheel_motor_mount_rail_width,wheel_motor_mount_rail_height]);
     }
 }
 module pivot_mount_rail_plus(){
     translate([-wheel_motor_mount_rail_width/2,0,0]){
-        cube([wheel_motor_mount_rail_width,wheel_motor_mount_rail_height,wheel_motor_mount_rail_depth]);
+        cube([wheel_motor_mount_rail_width,wheel_motor_mount_rail_height,front_wheel_motor_mount_rail_depth]);
     }
 }
 
 module pivot_mount_rail_minus(){
     for(i=[0:2]){
-        translate([-2.5,wheel_motor_mount_length/4+i*wheel_motor_mount_rail_interval*2,wheel_motor_mount_rail_depth]){
-            rotate([180,0,0]){
-                m3_bolt(wheel_motor_mount_rail_width);
-            }
-        }
-        translate([2.5,3*wheel_motor_mount_length/4+i*wheel_motor_mount_rail_interval*2,wheel_motor_mount_rail_depth]){
-            rotate([180,0,0]){
-                m3_bolt(wheel_motor_mount_rail_width);
+        for(offset=[-1,1]){
+            translate([2.5*offset,(2+offset)*wheel_motor_mount_length/4+i*wheel_motor_mount_rail_interval*2,front_wheel_motor_mount_rail_depth]){
+                rotate([180,0,0]){
+                    m3_bolt(wheel_motor_mount_rail_width);
+                }
             }
         }
     }
-    rail_nut_height=wheel_motor_mount_rail_depth-nut_height*1.1-4;
+    rail_nut_height=front_wheel_motor_mount_rail_depth-nut_height*1.1-4;
     for(y=[wheel_motor_mount_length/2:wheel_motor_mount_rail_interval:wheel_motor_mount_rail_height-nut_diameter]){
         translate([0,y,rail_nut_height]){
             rotate([0,0,30]) m3_nut_plus_bolt(10,5);
@@ -186,8 +183,15 @@ module pivot_mount_rail_minus(){
 
 module pivot_mount_rail(){
     difference(){
-        pivot_mount_rail_plus();
-        pivot_mount_rail_minus();
+        rotate([90,0,0]){
+            difference(){
+                pivot_mount_rail_plus();
+                pivot_mount_rail_minus();
+            }
+        }
+        translate([0,front_mount_radius-1,0]){
+            cylinder(r=front_mount_radius,h=wheel_motor_mount_rail_height);
+        }
     }
 }
 
@@ -212,12 +216,12 @@ module wheel_pivot_mount(){
             cylinder(d=wheel_motor_bearing_outer_diameter, h=wheel_motor_bearing_width);
         }
         for(rotation=[-front_wheel_mount_angle_offset,front_wheel_mount_angle_offset]){
-            rotate([0,0,rotation]){
-                pivot_mount_rail_slot();
-            }
+//            rotate([0,0,rotation]){
+//                pivot_mount_rail_slot();
+//            }
             for(z=[-1,1]){
                 rotate([0,0,rotation]){
-                    translate([front_mount_radius-base_wall_thickness-wheel_motor_mount_rail_depth,z*2.5,(2+z)*wheel_motor_mount_length/4]){
+                    translate([front_mount_radius-base_wall_thickness,z*2.5,front_wheel_mount_pivot_height/2+z*wheel_motor_mount_length/4]){
                         rotate([90,0,0]){
                             rotate([0,-90,0]){
                                 m3_nut_plus_bolt_insert(3*base_wall_thickness,2);
@@ -282,17 +286,17 @@ module front_right_wheel_mount(a,b,c,d,r0,r1,signmult){
     xp=(c*r0+a*r1)/(r0+r1);
     yp=(d*r0+b*r1)/(r0+r1);
     
-//    translate([xp,yp,10]) circle(r=1);
+//    translate([xp,yp,-10]) circle(r=1);
     
     x12=(r0*r0*(xp-a)+signmult*r0*(yp-b)*sqrt((xp-a)*(xp-a)+(yp-b)*(yp-b)-r0*r0))/((xp-a)*(xp-a)+(yp-b)*(yp-b))+a;
     y12=(r0*r0*(yp-b)-signmult*r0*(xp-a)*sqrt((xp-a)*(xp-a)+(yp-b)*(yp-b)-r0*r0))/((xp-a)*(xp-a)+(yp-b)*(yp-b))+b;
     
-    //translate([x12,y12,10]) circle(r=1);
+//    translate([x12,y12,-10]) circle(r=1);
     
     x34=(r1*r1*(xp-c)+signmult*r1*(yp-d)*sqrt((xp-c)*(xp-c)+(yp-d)*(yp-d)-r1*r1))/((xp-c)*(xp-c)+(yp-d)*(yp-d))+c;
     y34=(r1*r1*(yp-d)-signmult*r1*(xp-c)*sqrt((xp-c)*(xp-c)+(yp-d)*(yp-d)-r1*r1))/((xp-c)*(xp-c)+(yp-d)*(yp-d))+d;
     
-    //translate([x34,y34,10]) circle(r=1);
+//    translate([x34,y34,-10]) circle(r=1);
     
     theta=atan((y12-b)/(x12-a));
 //    width=(sqrt((x12-a)*(x12-a)+(y12-b)*(y12-b)));
@@ -325,7 +329,7 @@ module front_right_wheel_mount(a,b,c,d,r0,r1,signmult){
 
 module bevel_cutout(r){
     difference(){
-        square([r,r]);
+        translate([0,-2*r,0]) square([r,3*r]);
         translate([r,r,0]){
             circle(r=r);
         }
@@ -388,9 +392,14 @@ module front_left_wheel_mount_bevel(a,b,c,d,r0,r1,signmult){
 
 module front_wheel_mount_base(){
     linear_extrude(height=base_thickness+base_blade_indent_height+base_second_layer_thickness){
-        for(mir=[0,1]){
-            mirror([mir,0,0]){
-                front_right_wheel_mount(0,front_wheel_mount_back_circle_offset,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
+        difference(){
+            for(mir=[0,1]){
+                mirror([mir,0,0]){
+                    front_right_wheel_mount(0,front_wheel_mount_back_circle_offset,base_width/4,front_mount_radius/2,front_mount_radius,front_mount_radius/2,-1);
+                }
+            }
+            translate([0,2*front_wheel_mount_back_circle_offset,0]){
+                circle(r=front_mount_radius);
             }
         }
     }
@@ -399,8 +408,8 @@ module front_wheel_mount_base(){
 module wheel_pivot_base_mount(){
     difference(){
         front_wheel_mount_base();
-        translate([0,front_mount_base_legy,0]){
-            cylinder(r=front_mount_radius, h=front_wheel_mount_pivot_height);
+        translate([0,2*front_wheel_mount_back_circle_offset,0]){
+            //cylinder(r=front_mount_radius, h=front_wheel_mount_pivot_height);
             for(deg=[-front_wheel_mount_angle_offset,front_wheel_mount_angle_offset]){
                 rotate([0,0,deg-90]){
                     pivot_mount_rail_slot();
@@ -409,9 +418,3 @@ module wheel_pivot_base_mount(){
         }
     }
 }
-//wheel_pivot_base_mount();
-////pivot_and_wheels();
-//translate([0,front_mount_base_legy,0]){
-//    rotate([0,0,-90]) wheel_pivot_mount();
-//}
-wheel_pivot_mount();
