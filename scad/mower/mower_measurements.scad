@@ -29,6 +29,14 @@ wheel_radius=wheel_diameter/2;
 wheel_height=30;
 wheel_screw_depth=6;
 
+// Start of Pololu hub dimensions
+pololu_nub_diameter=12;
+pololu_nub_height=4.2;
+pololu_mount_hole_radius=9.5;
+pololu_mount_height=5;
+pololu_mount_inner_diameter=6;
+pololu_mount_outer_diameter=25.4;
+
 // Wheel mount dimensions
 wheel_mount_diameter=30;
 wheel_mount_height=wheel_motor_shaft_height-wheel_motor_bearing_width+2;
@@ -147,6 +155,7 @@ front_wheel_screw_depth=6;
 front_wheel_mount_bearing_buffer=3.5;
 front_wheel_mount_inner_diameter=wheel_motor_bearing_inner_diameter+front_wheel_mount_bearing_buffer;
 front_wheel_mount_outer_diameter=wheel_motor_bearing_outer_diameter-front_wheel_mount_bearing_buffer;
+front_wheel_mount_arc_angle=75;
 front_wheel_mount_buffer=2;
 front_wheel_mount_pivot_height=50;
 front_mount_x=base_wall_thickness+wheel_motor_bearing_outer_diameter/2-front_wheel_mount_inner_diameter/2+front_wheel_mount_inner_diameter/2+front_wheel_mount_buffer/2+front_wheel_radius;
@@ -212,14 +221,19 @@ battery_charger_pad3=30;
 battery_charger_pad4=37.5;
 battery_charger_pad5=45;
 battery_charger_lip_height=3;
-battery_diameter=19.00;
+battery_diameter=18.45;
+old_battery_diameter=19.00;
 battery_height=69.6;
 battery_holder_spacing=2;
-batteries_x_count=6;
-batteries_y_count=3;
+batteries_x_count=5;
+batteries_y_count=6;
+old_batteries_x_count=6;
+old_batteries_y_count=3;
 battery_holder_width=(battery_diameter+battery_holder_spacing)*batteries_x_count+battery_holder_spacing+3*battery_charger_thickness;
-battery_holder_length=(battery_diameter+battery_holder_spacing)*batteries_y_count+battery_holder_spacing;
+battery_holder_length=(battery_diameter+battery_holder_spacing)*batteries_y_count+battery_holder_spacing+6*screw_diameter;
 battery_holder_height=(battery_height-battery_charger_height)/2;
+old_battery_holder_width=(old_battery_diameter+battery_holder_spacing)*old_batteries_x_count+battery_holder_spacing+3*battery_charger_thickness;
+old_battery_holder_length=(old_battery_diameter+battery_holder_spacing)*old_batteries_y_count+battery_holder_spacing;
 battery_holder_mount_offset=8;
 battery_holder_mount_thickness=4;
 battery_holder_mount_basesize=3*screw_head_diameter;
@@ -279,6 +293,14 @@ compass_wall_thickness=2.5;
 compass_mount_screw_depth=8;
 compass_mount_x_offset=compass_width/2+1.5*screw_head_diameter;
 compass_mount_y_offset=compass_length/2+1.5*m2_screw_head_diameter;
+
+mpu9250_width=15.5;
+mpu9250_length=26;
+mpu9250_board_height=1.65;
+mpu9250_pin_width=2.5;
+mpu9250_pin_depth=2;
+mpu9250_mount_hole_x_offset=1.2;
+mpu9250_mount_hole_y_offset=1.3;
 
 // Start real time clock measurements
 rtc_width=23;
@@ -410,6 +432,8 @@ mega_board_thickness=1.6;
 mega_base_thickness=4;
 mega_board_offset=16-base_second_layer_thickness-mega_base_thickness-mega_board_thickness;
 mega_offset_radius=2.54;
+female_jumper_pitch=2.54;
+female_jumper_height=8.5;
 
 misc_mount_base_thickness=4;
 power_brass_width=12.8;
@@ -421,8 +445,44 @@ power_screw_spacing=[-power_screw_diameter/2,7.45,18.45,29.79,40.82,52.58,63.39]
 power_screw_length=8;
 power_height=power_screw_length+2;
 power_width=power_brass_width+2*misc_mount_base_thickness;
-power_length=power_screw_spacing[power_holes-1]+power_spacing+power_screw_diameter/2+2*misc_mount_base_thickness+2;
+power_length=power_spacing*power_holes+2*misc_mount_base_thickness+2;
 echo("power_length", power_length);
+
+apc_battery_width=51.5;
+apc_battery_length=151;
+apc_battery_height=94.5;
+apc_battery_terminal_offset=10;
+apc_strap_width=15;
+power_wire_diameter=3;
+
+plate_diameter=102;
+plate_height=3;
+plate_hole_diameter=5.75;
+
+antenna_width=38.5;
+antenna_length=51;
+antenna_bevel_width=27.75;
+
+emergency_stop_flange_diameter=60;
+emergency_stop_mount_diamter=24.5;
+emergency_stop_body_width=31;
+emergency_stop_body_length=38;
+
+lcd_board_length=81;
+lcd_board_width=37;
+lcd_board_height=1.6;
+lcd_screen_length=72;
+lcd_screen_width=25;
+lcd_mount_hole_length=75.4;
+lcd_mount_hole_width=31.4;
+lcd_mount_hole_diameter=2.8;
+lcd_pin_offset_x=7;
+lcd_pin_offset_y=1;
+lcd_pin_width=40;
+lcd_pin_height=5.5;
+lcd_led_bump_length=3.5;
+lcd_led_bump_width=13.5;
+lcd_led_bump_height=3.5;
 
 // Common modules
 module m3_nut(){
@@ -526,6 +586,29 @@ module curved_joint(a,b,c,d,r0,r1,signmult){
         }
     }
 }
+
+module screw_hole(x, y, z, length, type, headdepth){
+    if(type=="countersunk"){
+        translate([x,y,z-length]){
+            cylinder(d=screw_diameter,h=length);
+            cylinder(d1=screw_countersunk_head_diameter,d2=screw_diameter,h=screw_countersunk_head_height);
+        }
+        translate([x,y,z-length-headdepth]){
+            cylinder(d=screw_countersunk_head_diameter,h=headdepth);
+        }
+    } else {
+        translate([x,y,z-length]){
+            cylinder(d=screw_diameter,h=length);
+        }
+        translate([x,y,z-length-headdepth-screw_head_height]){
+            cylinder(d=screw_head_diameter,h=headdepth+screw_head_height);
+        }
+    }
+    translate([x,y,z-nut_height*1.1]){
+        m3_nut();
+    }
+}
+
 deck_height=(wheel_diameter-wheel_motor_diameter)/2;
 echo("Deck height = ", deck_height/10, " cm");
 echo("Deck height = ", deck_height/25.4, " inches");

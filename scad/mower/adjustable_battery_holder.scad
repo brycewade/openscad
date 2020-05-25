@@ -182,14 +182,14 @@ module battery_mount_clips(){
 
 module new_battery_base_plus(){
     // The base
-    translate([-battery_holder_mount_basesize,-battery_holder_mount_basesize-old_battery_holder_length/2,0]){
-        cube([old_battery_holder_width+2*battery_holder_mount_basesize,2*battery_holder_mount_basesize+old_battery_holder_length,misc_mount_base_thickness]);
+    translate([-battery_holder_mount_basesize-30,-battery_holder_mount_basesize-old_battery_holder_length/2,0]){
+        cube([old_battery_holder_width+2*battery_holder_mount_basesize+30,2*battery_holder_mount_basesize+old_battery_holder_length,misc_mount_base_thickness]);
     // The battery holder mount
         translate([0,(2*battery_holder_mount_basesize+old_battery_holder_length)/2-(battery_charger_height-2*battery_charger_lip_height)/2,misc_mount_base_thickness]){
-            cube([old_battery_holder_width,misc_mount_base_thickness,3*screw_diameter]);
+            cube([old_battery_holder_width+30,misc_mount_base_thickness,3*screw_diameter]);
         }
         translate([0,(2*battery_holder_mount_basesize+old_battery_holder_length)/2+(battery_charger_height-2*battery_charger_lip_height)/2-misc_mount_base_thickness,misc_mount_base_thickness]){
-            cube([old_battery_holder_width,misc_mount_base_thickness,3*screw_diameter]);
+            cube([old_battery_holder_width+30,misc_mount_base_thickness,3*screw_diameter]);
         }
     }
 }
@@ -202,12 +202,14 @@ module new_battery_base_minus(){
             }
         }
     }
-    for(y=[-1,1]){
-        for(x=[-1,1]){
-            translate([batteries_x_count*(battery_diameter+battery_holder_spacing)/2+x*(batteries_x_count-2)*(battery_diameter+battery_holder_spacing)/2,0,misc_mount_base_thickness+2*screw_diameter]){
-                rotate([90*y,0,0]){
-                    translate([0,0,-(2*battery_holder_mount_basesize+old_battery_holder_length)/2+(battery_charger_height-2*battery_charger_lip_height)/2]){
-                        m3_nut_plus_bolt(misc_mount_base_thickness*2, 0);
+    for(offset=[0,-12.5,-25,-37.5,-50]){
+        for(y=[-1,1]){
+            for(x=[-1,1]){
+                translate([batteries_x_count*(battery_diameter+battery_holder_spacing)/2+x*(batteries_x_count-2)*(battery_diameter+battery_holder_spacing)/2+offset,0,misc_mount_base_thickness+2*screw_diameter]){
+                    rotate([90*y,0,0]){
+                        translate([0,0,-(2*battery_holder_mount_basesize+old_battery_holder_length)/2+(battery_charger_height-2*battery_charger_lip_height)/2]){
+                            m3_nut_plus_bolt(misc_mount_base_thickness*2, 0);
+                        }
                     }
                 }
             }
@@ -256,6 +258,9 @@ module new_battery_antenna_mount_plus(){
         translate([rail_x_offset2,(2*battery_holder_mount_basesize+old_battery_holder_length)/2-(battery_charger_height-2*battery_charger_lip_height)/2,0]){
             cube([1.5*nut_diameter,(2*battery_holder_mount_basesize+old_battery_holder_length)-(battery_charger_height-2*battery_charger_lip_height)+misc_mount_base_thickness,2*misc_mount_base_thickness+3*screw_diameter]);
         }
+        translate([rail_x_offset1-50,(2*battery_holder_mount_basesize+old_battery_holder_length)/2-(battery_charger_height-2*battery_charger_lip_height)/2,2*misc_mount_base_thickness]){
+            cube([1.5*nut_diameter+50+(rail_x_offset2-rail_x_offset1),(2*battery_holder_mount_basesize+old_battery_holder_length)-(battery_charger_height-2*battery_charger_lip_height)+misc_mount_base_thickness,3*screw_diameter]);
+        }
     }
 }
 
@@ -274,16 +279,18 @@ module new_battery_antenna_mount_minus(){
         }
     }
     // Battery mount holes
-    for(y=[-1,1]){
-        for(x=[-1,1]){
-            translate([batteries_x_count*(battery_diameter+battery_holder_spacing)/2+x*(batteries_x_count-2)*(battery_diameter+battery_holder_spacing)/2,0,2*misc_mount_base_thickness+2*screw_diameter]){
-                rotate([90*y,0,0]){
-                    translate([0,0,-(2*battery_holder_mount_basesize+old_battery_holder_length)/2+(battery_charger_height-2*battery_charger_lip_height)/2]){
-                        m3_nut_plus_bolt(misc_mount_base_thickness*2, 0);
+    for(offset=[0, -12.5, -25, -37.5, -50]){
+        for(y=[-1,1]){
+            for(x=[-1,1]){
+                translate([batteries_x_count*(battery_diameter+battery_holder_spacing)/2+x*(batteries_x_count-2)*(battery_diameter+battery_holder_spacing)/2+offset,0,2*misc_mount_base_thickness+2*screw_diameter]){
+                    rotate([90*y,0,0]){
+                        translate([0,0,-(2*battery_holder_mount_basesize+old_battery_holder_length)/2+(battery_charger_height-2*battery_charger_lip_height)/2]){
+                            m3_nut_plus_bolt(misc_mount_base_thickness*2, 0);
+                        }
                     }
-                }
-                translate([-0.75*nut_diameter,-new_battery_antenna_mount_width/2+misc_mount_base_thickness,-2*screw_diameter]){
-                    cube([1.5*nut_diameter,new_battery_antenna_mount_width-2*misc_mount_base_thickness,3*screw_diameter]);
+                    translate([-0.75*nut_diameter,-new_battery_antenna_mount_width/2+misc_mount_base_thickness,-2*screw_diameter]){
+                        cube([1.5*nut_diameter+12.5,new_battery_antenna_mount_width-2*misc_mount_base_thickness,3*screw_diameter]);
+                    }
                 }
             }
         }
@@ -573,5 +580,5 @@ translate([0,battery_y,battery_holder_length+3*misc_mount_base_thickness]){
 
 
 //vizualize();
-
-//new_battery_antenna_mount();
+//new_battery_base();
+new_battery_antenna_mount();

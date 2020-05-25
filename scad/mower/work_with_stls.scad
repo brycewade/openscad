@@ -16,4 +16,11 @@ module bottom_front(x,y){
         bottom_section(x,y);
     }
 }
-bottom_front(0.5,3);
+
+module top_front(x,y){
+    intersection(){
+        translate([base_width/2,-very_back_y,0]) front_piece();
+        top_section(x,y);
+    }
+}
+top_front(0.5,2.5);

@@ -1,33 +1,33 @@
 include <mower_measurements.scad>
 $fn=360;
 
-    // Component locations
-    relay_x=1.5*screw_head_diameter+relay_width/2+relay_wall_thickness+m2_screw_head_diameter;
-    voltage_x=relay_x+relay_width/2+relay_wall_thickness+m2_screw_head_diameter+5+voltage_sensor_width/2+voltage_sensor_wall_thickness;
-    current_x=voltage_x+voltage_sensor_width/2+voltage_sensor_wall_thickness+5+current_sensor_width/2+current_sensor_wall_thickness+1.5*m2_screw_head_diameter;
+// Component locations
+relay_x=1.5*screw_head_diameter+relay_width/2+relay_wall_thickness+m2_screw_head_diameter;
+voltage_x=relay_x+relay_width/2+relay_wall_thickness+m2_screw_head_diameter+5+voltage_sensor_width/2+voltage_sensor_wall_thickness;
+current_x=voltage_x+voltage_sensor_width/2+voltage_sensor_wall_thickness+5+current_sensor_width/2+current_sensor_wall_thickness+1.5*m2_screw_head_diameter;
 
-    relay_y=0;
-    voltage_y=0;
-    current_y=0;
-    
-    nano_x=nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+1.5*screw_head_diameter;
-    rtc_x=nano_x+nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+5+rtc_width/2+rtc_wall_thickness;
-    dc2dcc_x=dc2dcc_width/2+dc2dcc_wall_thickness+1.5*screw_head_diameter;
-    
-    
-    nano_y=-1;
-    rtc_y=0;
-    dc2dcc_y=0;
-    
-    // Base size
-    12v_mount_length=relay_length+2*relay_wall_thickness;
-    12v_mount_width=current_x+current_sensor_width/2+current_sensor_wall_thickness+1.5*m2_screw_head_diameter+1.5*screw_head_diameter;
-    
-    5v_mount_length=dc2dcc_length+2*dc2dcc_wall_thickness;
-    5v_mount_width=dc2dcc_x+dc2dcc_width/2+dc2dcc_wall_thickness+1.5*screw_head_diameter;
-    
-    nano_mount_length=nano_length+2*nano_mount_thickness-2*nano_pin_offset+1+m2_screw_diameter;
-    nano_mount_width=nano_x+nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+1.5*screw_head_diameter;
+relay_y=0;
+voltage_y=0;
+current_y=0;
+
+nano_x=nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+1.5*screw_head_diameter;
+rtc_x=nano_x+nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+5+rtc_width/2+rtc_wall_thickness;
+dc2dcc_x=dc2dcc_width/2+dc2dcc_wall_thickness+1.5*screw_head_diameter;
+
+
+nano_y=-1;
+rtc_y=0;
+dc2dcc_y=0;
+
+// Base size
+12v_mount_length=relay_length+2*relay_wall_thickness;
+12v_mount_width=current_x+current_sensor_width/2+current_sensor_wall_thickness+1.5*m2_screw_head_diameter+1.5*screw_head_diameter;
+
+5v_mount_length=dc2dcc_length+2*dc2dcc_wall_thickness;
+5v_mount_width=dc2dcc_x+dc2dcc_width/2+dc2dcc_wall_thickness+1.5*screw_head_diameter;
+
+nano_mount_length=nano_length+2*nano_mount_thickness-2*nano_pin_offset+1+m2_screw_diameter;
+nano_mount_width=nano_x+nano_usb_width/2+nano_mount_thickness+m2_screw_diameter+1.5*screw_head_diameter;
 
 module nano_mount_plus(){
     // support pillars on pin side
@@ -462,40 +462,38 @@ module nano_mount_base(){
     }
 }
 
-module power_distribution_mount_plus(){
-    translate([-power_width/2,0,0]){
-        cube([power_width,power_length,power_height]);
+module mpu9250_plus(){
+    translate([-mpu9250_width/2,-mpu9250_length/2,0]){
+        cube([mpu9250_width,mpu9250_length,8]);
     }
-    for(y=[0,power_length]){
-        translate([0,y,0]){
-            cylinder(d=screw_head_diameter,h=6);
+    hull(){
+        for(x=[-compass_mount_x_offset,compass_mount_x_offset]){
+            translate([x,0,0]){
+                cylinder(d=1.5*screw_head_diameter,h=4);
+            }
         }
     }
 }
 
-module power_distribution_mount_minus(){
-    translate([-power_brass_width/2,misc_mount_base_thickness,power_height-misc_mount_base_thickness]){
-        cube([power_brass_width,power_length-2*misc_mount_base_thickness,misc_mount_base_thickness]);
+module mpu9250_minus(){
+    translate([-mpu9250_width/2,-mpu9250_length/2,8-mpu9250_pin_depth]){
+        cube([mpu9250_pin_width,mpu9250_length,mpu9250_pin_depth]);
     }
-    for(y=[0:power_holes-1]){
-        translate([0,power_screw_spacing[y]+power_screw_diameter/2+misc_mount_base_thickness+power_spacing/2+1,0]){
-            cylinder(d=power_screw_diameter, h=power_height);
+    for(x=[-compass_mount_x_offset,compass_mount_x_offset]){
+        translate([x,0,0]){
+            cylinder(d=screw_diameter,h=4);
         }
     }
-    for(y=[0,power_length]){
-        translate([0,y,0]){
-            cylinder(d=screw_diameter,h=6);
-        }
-        translate([0,y,6]){
-            cylinder(d=screw_head_diameter,h=power_height-6);
+    for(y=[-mpu9250_length/2+mpu9250_mount_hole_y_offset+screw_diameter/2,mpu9250_length/2-mpu9250_mount_hole_y_offset-screw_diameter/2]){
+        translate([mpu9250_width/2-mpu9250_mount_hole_x_offset-screw_diameter/2,y,0]){
+            cylinder(d=screw_diameter, h=8);
         }
     }
 }
 
-module power_distribution_mount(){
+module mpu9250(){
     difference(){
-        power_distribution_mount_plus();
-        power_distribution_mount_minus();
+        mpu9250_plus();
+        mpu9250_minus();
     }
 }
-//power_distribution_mount();

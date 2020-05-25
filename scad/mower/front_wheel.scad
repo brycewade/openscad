@@ -87,7 +87,7 @@ module right_half(){
 }
 
 module wheel_support_arc(){
-    rotate_extrude(angle=45, convexity=2){
+    rotate_extrude(angle=front_wheel_mount_arc_angle, convexity=2){
         translate([front_wheel_mount_inner_diameter,0,0]){
             square([base_wall_thickness*2+wheel_motor_bearing_outer_diameter,2*wheel_motor_bearing_width+2*front_wheel_mount_buffer]);
         }
@@ -98,11 +98,11 @@ module wheel_support_arc(){
 }
 
 module wheel_support_transition(){
-    rotate([0,0,-135]){
+    rotate([0,0,180+front_wheel_mount_arc_angle]){
         translate([-base_wall_thickness*2-wheel_motor_bearing_outer_diameter-front_wheel_mount_inner_diameter,0,0]){
             rotate([90,0,0]){
                 hull(){
-                    cube([(base_wall_thickness*2+wheel_motor_bearing_outer_diameter)*0.76,2*wheel_motor_bearing_width+2*front_wheel_mount_buffer,0.01]);
+                    cube([front_wheel_mount_inner_diameter,2*wheel_motor_bearing_width+2*front_wheel_mount_buffer,0.01]);
                     intersection(){
                         translate([front_wheel_mount_inner_diameter/2,wheel_motor_bearing_width+front_wheel_mount_buffer,base_wall_thickness+wheel_motor_bearing_outer_diameter/2]){
                             cylinder(d=front_wheel_mount_inner_diameter,h=0.01);
@@ -125,7 +125,21 @@ module wheel_bearing_cutout(){
 }
 
 module wheel_support_arc_cutoff(){
-    cube([front_wheel_mount_inner_diameter,front_wheel_mount_inner_diameter,2*wheel_motor_bearing_width+2*front_wheel_mount_buffer]);
+    x1=front_wheel_mount_inner_diameter;
+    y1=0;
+    x2=(base_wall_thickness*2+wheel_motor_bearing_outer_diameter+front_wheel_mount_inner_diameter-front_wheel_mount_inner_diameter)*cos(front_wheel_mount_arc_angle);
+    y2=(base_wall_thickness*2+wheel_motor_bearing_outer_diameter+front_wheel_mount_inner_diameter-front_wheel_mount_inner_diameter)*sin(front_wheel_mount_arc_angle);
+    
+    x=(x1*x1-x2*x2-y2*y2)/(2*(x1-x2));
+    y=0;
+    r=x1-x;
+    
+    translate([x,y,0]){
+        cylinder(r=r, h=2*wheel_motor_bearing_width+2*front_wheel_mount_buffer);
+    }
+    
+
+    //cube([front_wheel_mount_inner_diameter,front_wheel_mount_inner_diameter,2*wheel_motor_bearing_width+2*front_wheel_mount_buffer]);
 }
 
 module wheel_support(){
@@ -138,7 +152,7 @@ module wheel_support(){
 
 module wheel_pivot(){
     intersection(){
-        rotate([0,0,-135]){
+        rotate([0,0,180+front_wheel_mount_arc_angle]){
             translate([-base_wall_thickness*2-wheel_motor_bearing_outer_diameter-front_wheel_mount_inner_diameter+front_wheel_mount_inner_diameter/2,-base_wall_thickness-wheel_motor_bearing_outer_diameter/2,wheel_motor_bearing_width+front_wheel_mount_buffer]){
                 rotate([90,0,0]){
                     cylinder(d=front_wheel_mount_inner_diameter,h=front_wheel_mount_buffer);
@@ -418,3 +432,5 @@ module wheel_pivot_base_mount(){
         }
     }
 }
+
+//wheel_support_and_pivot();

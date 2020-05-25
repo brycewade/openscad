@@ -9,6 +9,7 @@ include <battery_holder.scad>
 include <gps_mount.scad>
 include <arduino_mount.scad>
 include <misc_mounts.scad>
+include <braces.scad>
 
 
 visualize=false;
@@ -88,27 +89,7 @@ nano_mount_x=55;
 nano_mount_y=very_front_y-35-mega_length;
 nano_mount_deg=0;
 
-module screw_hole(x, y, z, length, type, headdepth){
-    if(type=="countersunk"){
-        translate([x,y,z-length]){
-            cylinder(d=screw_diameter,h=length);
-            cylinder(d1=screw_countersunk_head_diameter,d2=screw_diameter,h=screw_countersunk_head_height);
-        }
-        translate([x,y,z-length-headdepth]){
-            cylinder(d=screw_countersunk_head_diameter,h=headdepth);
-        }
-    } else {
-        translate([x,y,z-length]){
-            cylinder(d=screw_diameter,h=length);
-        }
-        translate([x,y,z-length-headdepth-screw_head_height]){
-            cylinder(d=screw_head_diameter,h=headdepth+screw_head_height);
-        }
-    }
-    translate([x,y,z-nut_height*1.1]){
-        m3_nut();
-    }
-} 
+ 
 module cutout(){
     cylinder(r=blade_mount_inner_screw_radius+m4_nut_diameter/2+2*blade_buffer, h=base_top);
     rotate_extrude(){
@@ -776,3 +757,18 @@ echo("blades are offset ", blade_y_offset, "mm from each other");
 //    }
 //    translate([-base_width/2,very_front_y,0]) cube([base_width,500,base_layer1]);
 //}
+
+//translate([0,0,-25]) front_wheel_mount_holes();
+//translate([0,very_front_y+2*front_wheel_mount_back_circle_offset,0]){
+//    //cylinder(r=front_mount_radius, h=front_wheel_mount_pivot_height);
+//    for(deg=[-front_wheel_mount_angle_offset,front_wheel_mount_angle_offset]){
+//        rotate([0,0,deg-90]){
+//            //pivot_mount_rail_slot();
+//            translate([front_mount_radius-1+front_wheel_motor_mount_rail_depth,0,0]) rotate([0,0,-90]) front_brace();
+//        }
+//    }
+//}
+
+
+//            pivot_mount_rail_slot();
+//            translate([front_mount_radius-1+front_wheel_motor_mount_rail_depth,0,0]) rotate([0,0,-90]) motor_brace();
