@@ -32,7 +32,7 @@ stand_depth=1.25*cos(stand_angle)*tablet_width;
 stand_back_width=tablet_length*7/12;
 stand_back_offset=(tablet_length-stand_back_width)/2;
 stand_front_lip_height=6;
-stand_front_lip_depth=10;
+stand_front_lip_depth=10+rounding_radius;
 stand_front_height=14;
 
 module plug(){
@@ -96,6 +96,36 @@ module charger(){
     }
 }
 
+
+module lip(){
+    translate([rounding_radius,rounding_radius,tablet_top]){
+        rotate([180,0,0]){
+            rotate([0,90,0]){
+                translate([-rounding_radius,-rounding_radius,0]){
+                    intersection(){
+                        difference(){
+                            cube([rounding_radius,2*rounding_radius,tablet_length-2*rounding_radius]);
+                            cylinder(r=rounding_radius,h=tablet_length-2*rounding_radius);
+                            translate([0,2*rounding_radius,0]){
+                                cylinder(r=rounding_radius,h=tablet_length-2*rounding_radius);
+                            }
+                        }
+                        hull(){
+                            for(z=[2*rounding_radius,tablet_length-4*rounding_radius]){
+                                translate([0,2*rounding_radius,z]){
+                                    rotate([0,90,0]){
+                                        cylinder(r=2*rounding_radius,h=2*rounding_radius);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 module stand_plus(){
     front_y=1.5*tablet_top*sin(stand_angle)+rounding_radius;
     hull(){
@@ -116,6 +146,11 @@ module stand_plus(){
             rotate([0,90,0]) cylinder(r=0.01,h=stand_back_width);
         }
     }
+    translate([0,0,stand_front_lip_height-(qi_verticle_offset-charger_radius)*sin(stand_angle)]){
+        rotate([stand_angle,0,0]){
+            lip();
+        }
+    }
 }
 
 module cord_chase(){
@@ -123,18 +158,18 @@ module cord_chase(){
     cord_y_offset=qi_verticle_offset-charger_radius-charger_plug_width/2+charger_cord_diameter;
     translate([0,0,stand_front_lip_height-(qi_verticle_offset-charger_radius)*sin(stand_angle)]){
         rotate([stand_angle,0,0]){
-            translate([cord_x_offset-charger_height/2,cord_y_offset,-80]){
-                cube([charger_height,charger_plug_width,80+charger_thickness/2]);
+            translate([cord_x_offset-charger_height/2,cord_y_offset-80,0]){
+                cube([charger_plug_width,charger_plug_width+80,charger_height]);
             }
         }
     }
-    translate([cord_x_offset,-5,charger_cord_diameter/2]){
+    translate([cord_x_offset,-12,charger_cord_diameter/2]){
         rotate([-90,0,0]){
-            cylinder(d=charger_cord_diameter,h=stand_depth+5);
+            cylinder(d=charger_cord_diameter,h=stand_depth+12);
         }
     }
-    translate([cord_x_offset-charger_cord_diameter*0.475,-5,0]){
-        cube([0.95*charger_cord_diameter,stand_depth+5,charger_cord_diameter/2]);
+    translate([cord_x_offset-charger_cord_diameter*0.475,-12,0]){
+        cube([0.95*charger_cord_diameter,stand_depth+12,charger_cord_diameter/2]);
     }
 }
 
@@ -151,10 +186,13 @@ module stand(){
 }
 
 stand();
+//lip();
+
+
 /*
 translate([0,0,stand_front_lip_height-(qi_verticle_offset-charger_radius)*sin(stand_angle)]){
     rotate([stand_angle,0,0]){
-        charger();
+        minus();
         hull(){
             translate([rounding_radius,0,tablet_top-rounding_radius]) sphere(r=rounding_radius);
             translate([tablet_length-rounding_radius,0,tablet_top-rounding_radius]) sphere(r=rounding_radius);
